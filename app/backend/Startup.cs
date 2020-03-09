@@ -28,6 +28,8 @@ namespace SampleWebApp
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment HostingEnvironment { get; }
 
+        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -40,8 +42,13 @@ namespace SampleWebApp
             })
             .AddAzureAdB2C(options => Configuration.Bind("AzureADB2C", options))
             .AddCookie();
-            
-            //services.AddMvc();
+
+            services.AddCors(options => {
+                options.AddPolicy(MyAllowSpecificOrigins, builder => {
+                    builder.WithOrigins("https://localhost:4201");
+                });
+            });
+
             services.AddControllersWithViews();
             
             services.AddDistributedMemoryCache();
@@ -83,6 +90,7 @@ namespace SampleWebApp
             app.UseCookiePolicy();
             app.UseSession();
             app.UseAuthentication();
+            app.UseCors(MyAllowSpecificOrigins); 
 
             app.UseEndpoints(endpoints =>
             {

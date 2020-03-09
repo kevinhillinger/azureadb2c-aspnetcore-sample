@@ -27,7 +27,7 @@ import { ProfileComponent } from './profile/profile.component';
       cacheLocation : "sessionStorage",
       storeAuthStateInCookie: true,
       navigateToLoginRequestUrl : false,
-      redirectUri: "https://localhost:5001",
+      redirectUri: "https://localhost:4201",
       popUp: false, 
       validateAuthority: false, //must be false to support B2C
       authority: "https://idhack007.b2clogin.com/tfp/idhack007.onmicrosoft.com/B2C_1A_signup_signin",
