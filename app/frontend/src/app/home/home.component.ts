@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MsalService} from "@azure/msal-angular";
+import { MsalService } from "@azure/msal-angular";
 
 @Component({
   selector: 'app-home',
@@ -10,6 +10,10 @@ export class HomeComponent implements OnInit {
   welcomeMessage: string;
   
   constructor(private authService: MsalService) {
+  }
+  
+  signOut() {
+    this.authService.logout();
   }
 
   ngOnInit(): void {
