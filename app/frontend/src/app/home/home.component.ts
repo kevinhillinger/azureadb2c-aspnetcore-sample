@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { MsalService } from "@azure/msal-angular";
+import { AuthService } from '../security/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -8,29 +8,25 @@ import { MsalService } from "@azure/msal-angular";
 export class HomeComponent implements OnInit {
   displayName: string;
   welcomeMessage: string;
+  isAuthenticated: boolean;
+
+  constructor(private authService: AuthService) {
+  }
   
-  constructor(private authService: MsalService) {
+  resetPassword() {
+    this.authService.resetPassword();
+  }
+
+  signIn() {
+    this.authService.signIn();
   }
   
   signOut() {
-    this.authService.logout();
+    this.authService.signOut();
   }
 
   ngOnInit(): void {
-    let scopes = ["https://idhack007.onmicrosoft.com/webapp-sample-api/weatherforecast.read"];
-
-    this.authService.acquireTokenSilent(scopes, this.authService.authority).then((token) => {
-      console.log("acquired token silently");
-
-       let user = this.authService.getUser();
-
-        if (user.name) {
-          this.displayName = this.authService.getUser().name;
-          this.welcomeMessage = "Hello, " + this.displayName + "!";
-        }
-      }, (error) => {
-          console.log('problem with getting token silenty');
-          console.log(error);
-    });
+   this.isAuthenticated = this.authService.isAuthenticated();
   }
+  
 }

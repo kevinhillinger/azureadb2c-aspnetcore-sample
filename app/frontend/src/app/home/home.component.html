@@ -8,6 +8,10 @@
 </ul>
 
 <div>
-  <input type="button" value="Sign out" class="button" (click)="signOut()">
+  <input type="button" value="Sign in" class="btn btn-primary" (click)="signIn()" *ngIf="!isAuthenticated" style="margin-right:10px">
+  <input type="button" value="Forgot Password" class="btn btn-danger" (click)="resetPassword()" *ngIf="!isAuthenticated" style="margin-right:10px">
+
+  <input type="button" value="Reset Password" class="btn btn-warning" (click)="resetPassword()" *ngIf="isAuthenticated" style="margin-right:10px">
+  <input type="button" value="Sign out" class="btn btn-primary" (click)="signOut()" *ngIf="isAuthenticated">
 </div>
 
