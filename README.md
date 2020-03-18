@@ -50,3 +50,7 @@ Upload the base file first, followed by the extension files, then the "profile" 
 3. SignUpOrSignin.xml
 4. ProfileEdit.xml
 5. PasswordReset.xml
+
+
+https://devblogs.microsoft.com/aspnet/jwt-validation-and-authorization-in-asp-net-core/
+https://developer.okta.com/blog/2018/03/23/token-authentication-aspnetcore-complete-guide
