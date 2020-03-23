@@ -14,6 +14,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.Debug;
 using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using SampleWebApp.Security;
 
 namespace SampleWebApp
 {
@@ -39,31 +42,9 @@ namespace SampleWebApp
             {
                 sharedOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 sharedOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-            })
-            .AddAzureAdB2C(options => Configuration.Bind("AzureADB2C", options))
-            .AddCookie();
-
-            services.AddCors(options => {
-                options.AddPolicy(MyAllowSpecificOrigins, builder => {
-                    builder.WithOrigins("https://localhost:4201");
-                });
             });
 
-            services.AddControllersWithViews();
-            
-            services.AddDistributedMemoryCache();
-            services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromHours(1);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
-            
-            //In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            services.AddCorsUsingConfiguration(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -81,35 +62,15 @@ namespace SampleWebApp
             }
 
             app.UseHttpsRedirection();
-
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
-
             app.UseRouting();
-            app.UseCookiePolicy();
-            app.UseSession();
-            app.UseAuthentication();
-            app.UseCors(MyAllowSpecificOrigins); 
 
+            app.UseAuthentication();
+
+            app.UseCors(MyAllowSpecificOrigins); 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapControllers();
             });
-            // app.UseSpa(spa =>
-            // {
-            //     // To learn more about options for serving an Angular SPA from ASP.NET Core,
-            //     // see https://go.microsoft.com/fwlink/?linkid=864501
-
-            //     spa.Options.SourcePath = "ClientApp";
-
-            //     // if (env.IsDevelopment())
-            //     // {
-            //     //     spa.UseAngularCliServer(npmScript: "start");
-            //     // }
-            // });
         }
     }
 }
