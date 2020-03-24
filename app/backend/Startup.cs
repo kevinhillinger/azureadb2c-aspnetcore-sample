@@ -1,22 +1,16 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Logging.Console;
-using Microsoft.Extensions.Logging.Debug;
-using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.Extensions.Options;
 using SampleWebApp.Security;
+using static SampleWebApp.Security.IServiceCollectionExtensions;
 
 namespace SampleWebApp
 {
@@ -31,12 +25,11 @@ namespace SampleWebApp
         public IConfiguration Configuration { get; }
         public IWebHostEnvironment HostingEnvironment { get; }
 
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddControllers();
+            
+            services.Configure<AzureAuthenticationConfig>(Configuration.GetSection(AzureAuthenticationConfig.ConfigurationSectionName));
 
             services.AddAuthentication(sharedOptions =>
             {
@@ -48,7 +41,7 @@ namespace SampleWebApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, IOptions<List<CorsPolicyConfig>> corsOptions)
         {
             if (env.IsDevelopment())
             {
@@ -66,7 +59,8 @@ namespace SampleWebApp
 
             app.UseAuthentication();
 
-            app.UseCors(MyAllowSpecificOrigins); 
+            app.UseCors();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

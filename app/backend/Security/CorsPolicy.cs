@@ -6,12 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace SampleWebApp.Security
 {
-    class CorsPolicyConfig
+    public class CorsPolicyConfig
     {
         public const string ConfigurationSectionName = "CorsPolicies";
 
-        public string Name { get; } 
-        public string[] Origins { get; set; }
+        public string Name { get; set; } 
+        public List<string> AllowedOrigins { get; set; }
     }
 
     static class CorsPolicyExtensions
@@ -25,7 +25,7 @@ namespace SampleWebApp.Security
         public static void AddPolicy(this CorsOptions options, CorsPolicyConfig policy)
         {
             options.AddPolicy(policy.Name, builder => {
-                builder.WithOrigins(policy.Origins);
+                builder.WithOrigins(policy.AllowedOrigins.ToArray());
             });
         }
     }
