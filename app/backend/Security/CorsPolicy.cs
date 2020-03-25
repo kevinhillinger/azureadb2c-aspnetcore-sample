@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace SampleWebApp.Security
 {
@@ -16,9 +17,8 @@ namespace SampleWebApp.Security
 
     static class CorsPolicyExtensions
     {
-        public static void AddCorsUsingConfiguration(this IServiceCollection services, IConfiguration configuration) {
-            var policies = new List<CorsPolicyConfig>();
-            configuration.GetSection(CorsPolicyConfig.ConfigurationSectionName).Bind(policies);
+        public static void AddCorsPolicies(this IServiceCollection services) {
+            var policies = services.BuildServiceProvider().GetService<IOptions<List<CorsPolicyConfig>>>().Value;
             services.AddCors(options => policies.ForEach(options.AddPolicy));
         }
         

@@ -1,35 +1,19 @@
-
+﻿
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
-namespace SampleWebApp.Security
+namespace SampleWebApp.B2c.Authentication
 {
-    public static class IServiceCollectionExtensions
+    public static class B2cAuthenticationExtensions
     {
-        public class AzureAuthenticationConfig
+        public static void AddB2cAuthentication(this IServiceCollection services) 
         {
-            public const string ConfigurationSectionName = "AzureAuthentication";
-
-            public string Tenant { get; set; }
-            public string ClientId { get; set; }
-
-            public string Policy { get; set; }
-            public List<string> Scopes { get; set; }
-
-            public string Authority { get { return $"https://login.microsoftonline.com/tfp/{Tenant}/{ClientId}/v2.0/"; } }
-            
-            public string Audience { get { return ClientId; } }
-        }
-        
-        public static void AddAzureAuthentication(IServiceCollection services, IConfiguration configuration) 
-        {
-            var s = services.BuildServiceProvider();
-            s.Get
-            var config = configuration.GetSection(AzureAuthenticationConfig.ConfigurationSectionName).Get<AzureAuthenticationConfig>();
+            var config = services.BuildServiceProvider().GetService<IOptions<B2cAuthenticationConfig>>().Value;
 
             services.AddAuthentication(options =>
             {
