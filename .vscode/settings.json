@@ -1,4 +1,5 @@
 {
   "appService.preDeployTask": "publish-release",
-  "appService.deploySubpath": "SampleWebApp/bin/Release/netcoreapp3.1/publish"
+  "appService.deploySubpath": "SampleWebApp/bin/Release/netcoreapp3.1/publish",
+  "python.pythonPath": "./env/bin"
 }

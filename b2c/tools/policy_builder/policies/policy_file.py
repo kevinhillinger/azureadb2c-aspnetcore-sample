@@ -1,0 +1,4 @@
+
+
+class PolicyFile(object):
+    pass
