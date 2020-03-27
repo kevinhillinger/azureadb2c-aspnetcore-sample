@@ -11,11 +11,11 @@ namespace SampleWebApp.B2c.Integration.Controllers
     [Authorize(AuthenticationSchemes = CertificateAuthenticationDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("b2c/[controller]")]
-    public class EmailVerifyController : ControllerBase
+    public class ValidateEmailController : ControllerBase
     {
         private readonly ILogger<UserProfileController> _logger;
 
-        public EmailVerifyController(ILogger<UserProfileController> logger)
+        public ValidateEmailController(ILogger<UserProfileController> logger)
         {
             _logger = logger;
         }
