@@ -10,5 +10,10 @@ namespace SampleWebApp.B2c.Integration.Models
         public string LastName { get; set; }
 
         public List<string> Roles {get;set;}
+
+        public UserProfileResponse()
+        {
+            Roles = new List<string>(10);
+        }
     }
 }

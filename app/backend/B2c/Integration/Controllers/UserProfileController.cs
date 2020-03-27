@@ -30,7 +30,7 @@ namespace SampleWebApp.B2c.Integration.Controllers
                 return BadRequest("id or email address is required");
             }
 
-            if (!TryGetUserProfile(request.EmailAddress, out var userProfile))
+            if (!TryGetUserProfile(request.Email, out var userProfile))
             {
                 return NotFound();
             }
@@ -38,7 +38,7 @@ namespace SampleWebApp.B2c.Integration.Controllers
             return Ok(new UserProfileResponse());
         }
 
-        private bool TryGetUserProfile(string emailAddress, out UserProfile userProfile) 
+        private bool TryGetUserProfile(string email, out UserProfile userProfile) 
         {
             userProfile = new UserProfile();
             return true;

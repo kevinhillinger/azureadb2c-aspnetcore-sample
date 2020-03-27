@@ -2,7 +2,6 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace SampleWebApp.Security
 {
@@ -11,9 +10,6 @@ namespace SampleWebApp.Security
         public static void AddCertificateAuthentication(this IServiceCollection services) 
         {
             services.AddTransient<ClientCertificateHandler>();
-
-          //  var provider = services.BuildServiceProvider();
-          //  var certificatesConfig = provider.GetService<IOptions<CertificatesConfig>>().Value;
 
              services
                 .AddAuthentication(CertificateAuthenticationDefaults.AuthenticationScheme)
@@ -43,34 +39,12 @@ namespace SampleWebApp.Security
                     X509Certificate2 clientCertificate = null;
                     if(!string.IsNullOrWhiteSpace(headerValue))
                     {
-                        byte[] bytes = StringToByteArray(headerValue);
+                        byte[] bytes = Convert.FromBase64String(headerValue);
                         clientCertificate = new X509Certificate2(bytes);
                     }
                     return clientCertificate;
                 };
             });
-
-            // foreach (var clientCertificateConfig in certificatesConfig)
-            // {
-            //     var name = clientCertificateConfig.Key;
-
-            //     services.AddAuthorization(options =>
-            //     {
-            //         options.AddPolicy(name = $"{name}{CertificateAuthenticationDefaults.AuthenticationScheme}Policy", policy =>
-            //         {
-            //             policy.AuthenticationSchemes.Add(CertificateAuthenticationDefaults.AuthenticationScheme);
-            //         });
-            //     });
-            // }
-        }
-
-        private static byte[] StringToByteArray(string hex)
-        {
-            int NumberChars = hex.Length;
-            byte[] bytes = new byte[NumberChars / 2];
-            for (int i = 0; i < NumberChars; i += 2)
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
-            return bytes;
         }
 
         private static ClientCertificate GetClientCertificate(this CertificateValidatedContext context)
