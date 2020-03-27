@@ -1,4 +1,4 @@
-namespace SampleWebApp.B2C.Models
+namespace SampleWebApp.B2c.Integration.Models
 {
     public class UserProfileRequest
     {

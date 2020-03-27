@@ -9,12 +9,12 @@ namespace SampleWebApp.Controllers
 {
     [ApiController]
     [Route("b2c/[controller]")]
-    public class RoleController : ControllerBase
+    public class RolesController : ControllerBase
     {
 
         private readonly ILogger<ProfileController> _logger;
 
-        public RoleController(ILogger<ProfileController> logger)
+        public RolesController(ILogger<ProfileController> logger)
         {
             _logger = logger;
         }

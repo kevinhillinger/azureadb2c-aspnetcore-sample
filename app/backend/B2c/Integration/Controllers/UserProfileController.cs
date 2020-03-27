@@ -1,22 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SampleWebApp.B2C.Models;
+using SampleWebApp.B2c.Integration.Models;
 
-namespace SampleWebApp.Controllers
+namespace SampleWebApp.B2c.Integration.Controllers
 {
+    [Authorize(AuthenticationSchemes = CertificateAuthenticationDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("b2c/[controller]")]
     public class UserProfileController : ControllerBase
     {
+        private readonly ILogger<UserProfileController> _logger;
 
-        private readonly ILogger<ProfileController> _logger;
-
-        public UserProfileController(ILogger<ProfileController> logger)
+        public UserProfileController(ILogger<UserProfileController> logger)
         {
             _logger = logger;
         }

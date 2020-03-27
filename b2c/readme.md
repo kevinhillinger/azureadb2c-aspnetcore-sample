@@ -21,3 +21,9 @@ git clone https://github.com/Azure-Samples/active-directory-b2c-custom-policy-st
 
 [https://github.com/azure-ad-b2c/samples/tree/master/policies/force-password-reset-after-90-days](https://github.com/azure-ad-b2c/samples/tree/master/policies/force-password-reset-after-90-days)
 
+# Backend
+
+## B2C Integration of Web API 
+
+### Client Certificates
+https://docs.microsoft.com/en-us/azure/app-service/app-service-web-configure-tls-mutual-auth

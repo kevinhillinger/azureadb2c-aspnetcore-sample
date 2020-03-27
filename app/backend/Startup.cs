@@ -26,6 +26,7 @@ namespace SampleWebApp
         {
             services.AddControllers();
             services.AddConfiguration(Configuration);
+            services.AddCertificateAuthentication();
             services.AddB2cAuthentication();
             services.AddCorsPolicies();
         }
@@ -46,9 +47,10 @@ namespace SampleWebApp
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
+            app.UseCertificateForwarding();
             app.UseAuthentication();
-
+            app.UseAuthorization();
+            
             app.UseCors();
 
             app.UseEndpoints(endpoints =>
@@ -60,10 +62,12 @@ namespace SampleWebApp
 
     static class IServiceCollectionExtensions
     {
+
         public static void AddConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<B2cAuthenticationConfig>(configuration.GetSection(B2cAuthenticationConfig.ConfigurationSectionName));
             services.Configure<CorsPolicyConfig>(configuration.GetSection(CorsPolicyConfig.ConfigurationSectionName));
+            services.Configure<CertificatesConfig>(configuration.GetSection(CertificatesConfig.ConfigurationSectionName));
         }
     }
 }

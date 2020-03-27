@@ -7,14 +7,6 @@ using Microsoft.Extensions.Options;
 
 namespace SampleWebApp.Security
 {
-    public class CorsPolicyConfig
-    {
-        public const string ConfigurationSectionName = "CorsPolicies";
-
-        public string Name { get; set; } 
-        public List<string> AllowedOrigins { get; set; }
-    }
-
     static class CorsPolicyExtensions
     {
         public static void AddCorsPolicies(this IServiceCollection services) {
