@@ -41,10 +41,12 @@ namespace SampleWebApp.Security
                 return false;
             }
 
-            return certificatesConfig.Any(c => clientCertificate.IsActive() 
+            var isValid = certificatesConfig.Any(c => clientCertificate.IsActive() 
                 && clientCertificate.HasSubject(c.Subject)
                 && clientCertificate.HasIssuer(c.Issuer)
                 && clientCertificate.HasThumbprint(c.Thumbprint));
+            
+            return isValid;
         }
     }
 }

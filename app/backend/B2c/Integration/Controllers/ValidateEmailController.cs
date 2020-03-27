@@ -24,19 +24,19 @@ namespace SampleWebApp.B2c.Integration.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Post(string email)
+        public IActionResult Post([FromBody] ValidateEmailRequest request)
         {
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(request.Email))
             {
                 return BadRequest("Email address is required");
             }
 
-            if (!DoesEmailExist(email))
+            if (!DoesEmailExist(request.Email))
             {
                 return NotFound();
             }
 
-            return Ok(new EmailVerifyResponse { Exists = true, Count = 1 });
+            return Ok(new ValidateEmailResponse { Validated = true, Count = 1 });
         }
 
         private bool DoesEmailExist(string email)

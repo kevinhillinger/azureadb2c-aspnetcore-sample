@@ -33,7 +33,7 @@ namespace SampleWebApp
                     {
                         options.ConfigureHttpsDefaults(o =>
                         {
-                            o.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
+                            o.ClientCertificateMode = ClientCertificateMode.AllowCertificate;
                         });
                     });
                 });
