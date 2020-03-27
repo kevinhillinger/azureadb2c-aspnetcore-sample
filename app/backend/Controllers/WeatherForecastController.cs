@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace SampleWebApp.Controllers
 {
+    [Authorize()]
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase

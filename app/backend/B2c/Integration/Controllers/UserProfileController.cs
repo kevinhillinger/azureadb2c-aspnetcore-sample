@@ -7,23 +7,14 @@ using SampleWebApp.B2c.Integration.Models;
 
 namespace SampleWebApp.B2c.Integration.Controllers
 {
-    [Authorize(AuthenticationSchemes = CertificateAuthenticationDefaults.AuthenticationScheme)]
-    [ApiController]
-    [Route("b2c/[controller]")]
-    public class UserProfileController : ControllerBase
+    public class UserProfileController : IntegrationControllerBase<UserProfileRequest>
     {
-        private readonly ILogger<UserProfileController> _logger;
 
-        public UserProfileController(ILogger<UserProfileController> logger)
+        public UserProfileController(ILogger<UserProfileController> logger) : base(logger)
         {
-            _logger = logger;
         }
 
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult Post([FromBody] UserProfileRequest request)
+        public override IActionResult Post(UserProfileRequest request)
         {
             if (!request.IsValid())
             {

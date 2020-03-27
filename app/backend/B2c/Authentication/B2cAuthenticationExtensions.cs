@@ -35,7 +35,7 @@ namespace SampleWebApp.B2c.Authentication
             // For debugging purposes only!
             var s = $"AuthenticationFailed: {arg.Exception.Message}";
             arg.Response.ContentLength = s.Length;
-            arg.Response.Body.Write(Encoding.UTF8.GetBytes(s), 0, s.Length);
+            arg.Response.Body.WriteAsync(Encoding.UTF8.GetBytes(s), 0, s.Length);
             return Task.FromResult(0);
         }
     }

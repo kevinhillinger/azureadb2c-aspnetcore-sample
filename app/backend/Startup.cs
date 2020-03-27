@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
 using SampleWebApp.B2c.Authentication;
 using SampleWebApp.Security;
 
@@ -24,6 +25,8 @@ namespace SampleWebApp
 
         public void ConfigureServices(IServiceCollection services)
         {
+            IdentityModelEventSource.ShowPII = true;
+            
             services.AddControllers();
             services.AddConfiguration(Configuration);
             services.AddCertificateAuthentication();
