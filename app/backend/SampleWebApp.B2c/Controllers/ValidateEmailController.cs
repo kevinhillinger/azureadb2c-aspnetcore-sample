@@ -1,8 +1,8 @@
-using backend.B2c.Integration.Models;
+using SampleWebApp.B2c.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace SampleWebApp.B2c.Integration.Controllers
+namespace SampleWebApp.B2c.Controllers
 {
     public class ValidateEmailController : IntegrationControllerBase<ValidateEmailRequest>
     {
@@ -27,6 +27,7 @@ namespace SampleWebApp.B2c.Integration.Controllers
 
         private bool DoesEmailExist(string email)
         {
+            // hard coded sample only
             return true;
         }
     }

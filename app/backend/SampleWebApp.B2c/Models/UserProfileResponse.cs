@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SampleWebApp.B2c.Integration.Models
+namespace SampleWebApp.B2c.Models
 {
     public class UserProfileResponse
     {
@@ -9,11 +9,11 @@ namespace SampleWebApp.B2c.Integration.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public List<string> Roles {get;set;}
+        public string Roles {get;set;}
 
         public UserProfileResponse()
         {
-            Roles = new List<string>(10);
+            Roles = string.Join(",", new string[] { "Role1", "Role2" });
         }
     }
 }

@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SampleWebApp.B2c.Integration.Models;
+using SampleWebApp.B2c.Models;
 
-namespace SampleWebApp.B2c.Integration.Controllers
+namespace SampleWebApp.B2c.Controllers
 {
     public class UserProfileController : IntegrationControllerBase<UserProfileRequest>
     {
@@ -26,7 +26,7 @@ namespace SampleWebApp.B2c.Integration.Controllers
                 return NotFound();
             }
 
-            return Ok(new UserProfileResponse());
+            return Ok(new UserProfileResponse() { FirstName = "Floyd", LastName = "Weatherman", Email = "floydweather@contoso.net"});
         }
 
         private bool TryGetUserProfile(string email, out UserProfile userProfile) 

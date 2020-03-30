@@ -1,5 +1,5 @@
 
-namespace SampleWebApp.B2c.Integration.Models
+namespace SampleWebApp.B2c.Models
 {
     ///
     ///<summary>Simulated model that will map to an api response</summary>
