@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Q2 Solutions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://customuifilesq2.blob.core.windows.net/customuicontainerfileq2/main.css" rel="stylesheet">
+</head>
+<body>
+    <script>
+        $.ajaxSetup({
+            cache: true
+        });
+    </script>
+      <!-- right after body tag -->
+      <dialog id="myDialog">
+        <p>
+            <q>Terms and conditions goes here.</q>
+        </p>
+        <button id="hide">Close</button>
+    </dialog>
+    <div class="container wait-for-load div_center">
+        <div style="margin-top: 10%" class="div_inline_block">
+            <h2 style="margin-top: 0px; text-align: center;">Q2 Solutions</h2>
+            <p style="text-align: center;">Sign In</p>
+        </div>
+        <!-- B2C Markup Injected Here -->
+        <div id="api">
+            
+        </div>
+    </div>
+<script type="text/javascript" src="https://customuifilesq2.blob.core.windows.net/customuicontainerfileq2/index.js"></script></body>
+<script type="text/javascript">
+    var dialog = document.getElementById('myDialog');  
+
+    document.getElementById('hide').onclick = function() {  
+        dialog.close();  
+    };  
+
+    function customizeSignInUI() {
+        //Hide the provide the following information label
+        var introdivElements = document.getElementsByClassName("intro");
+        if(typeof(introdivElements) != 'undefined' && introdivElements != null){
+            for (var i=0; i<introdivElements.length; i++) {
+                introdivElements.item(i).style.display = "none";
+            }
+        }
+        var dividerElements = document.getElementsByClassName("divider");
+        if(typeof(dividerElements) != 'undefined' && dividerElements != null){
+            for (var i=0; i<dividerElements.length; i++) {
+                dividerElements.item(i).style.display = "none";
+            }
+        }
+
+        var emailElem = document.getElementById("signInName");
+        if(typeof(emailElem) != 'undefined' && emailElem != null){
+            var labelForEmailControl = findLableForControl(emailElem);
+            if(typeof(labelForEmailControl) != 'undefined' && labelForEmailControl != null){
+                labelForEmailControl.style.display = "none";
+            } 
+        }
+
+        var passwordElem = document.getElementById("password");
+        if(typeof(passwordElem) != 'undefined' && passwordElem != null){
+            var labelForPasswordControl = findLableForControl(passwordElem);
+            if(typeof(labelForPasswordControl) != 'undefined' && labelForPasswordControl != null){
+                labelForPasswordControl.style.display = "none";
+            } 
+        }
+
+        //move the forgotpassword to the right place
+        var forgotPassWordElem =  document.getElementById("forgotPassword");
+        var buttonElements =  document.getElementsByClassName("buttons");
+        if(typeof(buttonElements) != 'undefined' 
+            && buttonElements != null
+            && buttonElements.length > 0){
+            var buttonElemParent = buttonElements[0].parentNode;
+            buttonElemParent.appendChild(forgotPassWordElem);
+            addBreaksToDivElements(buttonElemParent);
+        }
+
+        //add spacings as required
+        var divEntryItems = document.getElementsByClassName("entry-item");
+        if(typeof(divEntryItems) != 'undefined' && divEntryItems != null){
+
+           for (var i=0; i<divEntryItems.length; i++) {
+                addBreaksToDivElements(divEntryItems[i]);
+           }
+        }
+
+        //Center align the controls (buttons)
+        var divEntries = document.getElementsByClassName("entry");
+        if(typeof(divEntries) != 'undefined' && divEntries != null){
+
+           for (var i=0; i<divEntries.length; i++) {
+                divEntries[i].setAttribute("align", "center");
+           }
+        }
+
+        var divOptions = document.getElementsByClassName("options");
+        if(typeof(divOptions) != 'undefined' && divOptions != null){
+
+           for (var i=0; i<divOptions.length; i++) {
+                divOptions[i].setAttribute("align", "center");
+           }
+        }
+        var divCreate = document.getElementsByClassName("create");
+        if(typeof(divCreate) != 'undefined' && divCreate != null){
+
+           for (var i=0; i<divCreate.length; i++) {
+                divCreate[i].setAttribute("align", "center");
+           }
+        }
+        dialog.close();
+        moveElementsOfGivenClassAsElement("claims-provider-list-buttons");   
+        moveElementsOfGivenClassAsElement("create");   
+        addAnchorElement();
+
+       
+    }
+
+    function addAnchorElement(){
+        var divApiElem = document.getElementById("api");
+        var anchorDivElement = createAnchorElement();
+        divApiElem.appendChild(anchorDivElement);
+    }
+
+    function createAnchorElement(){
+        var divElem = document.createElement('div');  
+
+        divElem.setAttribute("align", "center");
+         // Create anchor element. 
+         var a = document.createElement('a');  
+                  
+        // Create the text node for anchor element. 
+        var link = document.createTextNode("Terms And Conditions"); 
+        
+        // Append the text node to anchor element. 
+        a.appendChild(link);  
+        
+        // Set the title. 
+        a.title = "Terms And Conditions";  
+        
+        // Set the href property. 
+        a.href = "#";  
+        a.onclick = function() {
+            var dialog = document.getElementById('myDialog'); 
+            dialog.showModal();
+        };
+       
+        divElem.appendChild(a);
+       return divElem;
+    }
+
+    function moveElementsOfGivenClassAsElement(className){
+        var elemsOfClass = document.getElementsByClassName(className);
+        if(typeof(elemsOfClass) != 'undefined' 
+            && elemsOfClass != null
+            && elemsOfClass.length > 0){
+            var elemToMove = elemsOfClass[0];
+            //this will move the element to the end of the parent element
+            elemToMove.parentNode.appendChild(elemToMove);
+        }
+    }
+    function findLableForControl(el) {
+        var idVal = el.id;
+        labels = document.getElementsByTagName('label');
+        for( var i = 0; i < labels.length; i++ ) {
+            if (labels[i].htmlFor == idVal)
+                return labels[i];
+        }
+    }
+
+    function addBreaksToDivElements(divElem){
+        for (var i=0; i<2; i++) {
+        linebreak = document.createElement("br");
+        divElem.appendChild(linebreak);
+        }
+    }
+
+    
+    window.onload = customizeSignInUI();
+</script>
+
+</html>

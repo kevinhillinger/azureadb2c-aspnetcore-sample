@@ -32,15 +32,14 @@ fi
 
 # build
 echo "Building frontend."
-pushd ../app/frontend && ng build && popd
+pushd ../app/frontend && ng build --prod && popd
 
 # deploy
 echo "Deploying angular app to blob storage."
 az storage blob upload-batch \
     -s ../app/frontend/dist \
     -d \$web \
-    --account-name $storage_account_name \
-    --content-type 'text/html; charset=utf-8'
+    --account-name $storage_account_name 
 
 echo ""
 echo "Website URL: " + "$(az storage account show -n $storage_account_name -g $resource_group -o tsv --query 'primaryEndpoints.web')"

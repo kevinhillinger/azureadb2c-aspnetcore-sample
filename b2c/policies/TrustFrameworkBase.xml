@@ -4,9 +4,9 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
   PolicySchemaVersion="0.3.0.0"
-  TenantId="idhack007.onmicrosoft.com"
-  PolicyId="B2C_1A_TrustFrameworkBase"
-  PublicPolicyUri="http://idhack007.onmicrosoft.com/B2C_1A_TrustFrameworkBase">
+  TenantId="{Settings:Tenant}"
+  PolicyId="{Settings:BasePolicy}TrustFrameworkBase"
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}TrustFrameworkBase">
 
   <BuildingBlocks>
     <ClaimsSchema>
@@ -25,6 +25,66 @@
            claims provider for credential storage which will have its own restrictions. -->
 
       <!-- SECTION I: Claims required for user journeys to work properly -->
+      <ClaimType Id="Otp">
+        <DisplayName>Secondary One-time password</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="sendGridReqBody">
+        <DisplayName>SendGrid request body</DisplayName>
+        <DataType>string</DataType>
+      </ClaimType>
+      <ClaimType Id="VerificationCode">
+        <DisplayName>Secondary Verification Code</DisplayName>
+        <DataType>string</DataType>
+        <UserHelpText>Enter your email verification code</UserHelpText>
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
+      <!---Claims for Password history requirements-->
+      <ClaimType Id="dummyFalse">
+				<DisplayName>dummyFalse</DisplayName>
+				<DataType>boolean</DataType>
+				<AdminHelpText>dummyFalse</AdminHelpText>
+				<UserHelpText>dummyFalse</UserHelpText>
+			</ClaimType>
+
+			<ClaimType Id="oldPassword">
+				<DisplayName>Old Password</DisplayName>
+				<DataType>string</DataType>
+				<UserHelpText>Enter password</UserHelpText>
+				<UserInputType>Password</UserInputType>
+			</ClaimType>
+			<ClaimType Id="extension_lastPasswordChange">
+				<DisplayName>extension_lastLogonTime</DisplayName>
+				<DataType>dateTime</DataType>
+				<AdminHelpText>extension_lastLogonTime</AdminHelpText>
+				<UserHelpText>extension_lastLogonTime</UserHelpText>
+			</ClaimType>
+
+			<ClaimType Id="extension_lastLogonTime">
+				<DisplayName>extension_lastLogonTime</DisplayName>
+				<DataType>dateTime</DataType>
+				<AdminHelpText>extension_lastLogonTime</AdminHelpText>
+				<UserHelpText>extension_lastLogonTime</UserHelpText>
+			</ClaimType>
+
+			<ClaimType Id="CurrentTime">
+				<DisplayName>Current time</DisplayName>
+				<DataType>dateTime</DataType>
+				<UserHelpText>Current time</UserHelpText>
+			</ClaimType>
+
+			<ClaimType Id="userPasswordExpired">
+				<DisplayName>is the last time the user did MFA over the window</DisplayName>
+				<DataType>boolean</DataType>
+				<UserHelpText>is the last time the user did MFA over the window</UserHelpText>
+			</ClaimType>
+
+			<ClaimType Id="userLockedOutForInactivity">
+				<DisplayName>is the last time the user did MFA over the window</DisplayName>
+				<DataType>boolean</DataType>
+				<UserHelpText>is the last time the user did MFA over the window</UserHelpText>
+			</ClaimType>
 
       <ClaimType Id="socialIdpUserId">
         <DisplayName>Username</DisplayName>
@@ -34,6 +94,22 @@
         <Restriction>
           <Pattern RegularExpression="^[a-zA-Z0-9]+[a-zA-Z0-9_-]*$" HelpText="The username you provided is not valid. It must begin with an alphabet or number and can contain alphabets, numbers and the following symbols: _ -" />
         </Restriction>
+      </ClaimType>
+
+      <ClaimType Id="issuerUserId">
+        <DisplayName>Username</DisplayName>
+        <DataType>string</DataType>
+        <UserHelpText/>
+        <UserInputType>TextBox</UserInputType>
+        <Restriction>
+          <Pattern RegularExpression="^[a-zA-Z0-9]+[a-zA-Z0-9_-]*$" HelpText="The username you provided is not valid. It must begin with an alphabet or number and can contain alphabets, numbers and the following symbols: _ -" />
+        </Restriction>
+      </ClaimType>
+      
+       <ClaimType Id="alternativeSecurityId">
+        <DisplayName>AlternativeSecurityId</DisplayName>
+        <DataType>string</DataType>
+        <UserHelpText/>
       </ClaimType>
 
       <ClaimType Id="tenantId">
@@ -95,9 +171,7 @@
         <DataType>string</DataType>
         <UserHelpText>Enter new password</UserHelpText>
         <UserInputType>Password</UserInputType>
-        <Restriction>
-          <Pattern RegularExpression="^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])|(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])|(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]))([A-Za-z\d@#$%^&amp;*\-_+=[\]{}|\\:',?/`~&quot;();!]|\.(?!@)){8,16}$" HelpText="8-16 characters, containing 3 out of 4 of the following: Lowercase characters, uppercase characters, digits (0-9), and one or more of the following symbols: @ # $ % ^ &amp; * - _ + = [ ] { } | \ : ' , ? / ` ~ &quot; ( ) ; ." />
-        </Restriction>
+        <PredicateValidationReference Id="CustomPassword" />
       </ClaimType>
       <!-- The password regular expression above is constructed for AAD passwords based on restrictions at https://msdn.microsoft.com/en-us/library/azure/jj943764.aspx
 
@@ -113,15 +187,17 @@
         ) {8,16}$                                       # the length must be between 8 and 16 chars inclusive
 
       -->
-
+      <ClaimType Id="isNewPasswordEmail">
+        <DisplayName>Is New Password Valid</DisplayName>
+        <DataType>boolean</DataType>
+        <UserHelpText></UserHelpText>
+      </ClaimType>
       <ClaimType Id="reenterPassword">
         <DisplayName>Confirm New Password</DisplayName>
         <DataType>string</DataType>
         <UserHelpText>Confirm new password</UserHelpText>
         <UserInputType>Password</UserInputType>
-        <Restriction>
-          <Pattern RegularExpression="^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])|(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])|(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]))([A-Za-z\d@#$%^&amp;*\-_+=[\]{}|\\:',?/`~&quot;();!]|\.(?!@)){8,16}$" HelpText=" " />
-        </Restriction>
+        <PredicateValidationReference Id="CustomPassword" />
       </ClaimType>
 
       <ClaimType Id="passwordPolicies">
@@ -276,6 +352,40 @@
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
 
+      <ClaimType Id="emailvalidated">
+        <DisplayName>Email Validated</DisplayName>
+        <DataType>boolean</DataType>
+        <DefaultPartnerClaimTypes>
+          <Protocol Name="OAuth2" PartnerClaimType="validated" />
+          <Protocol Name="OpenIdConnect" PartnerClaimType="validated" />
+          <Protocol Name="SAML2" PartnerClaimType="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/validated" />
+        </DefaultPartnerClaimTypes>
+        <UserHelpText>Email validated</UserHelpText>
+      </ClaimType>
+
+      <ClaimType Id="emailcount">
+        <DisplayName>Email Count</DisplayName>
+        <DataType>int</DataType>
+        <DefaultPartnerClaimTypes>
+          <Protocol Name="OAuth2" PartnerClaimType="count" />
+          <Protocol Name="OpenIdConnect" PartnerClaimType="count" />
+          <Protocol Name="SAML2" PartnerClaimType="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/count" />
+        </DefaultPartnerClaimTypes>
+        <UserHelpText>Email Count</UserHelpText>
+      </ClaimType>
+
+       <ClaimType Id="roles">
+        <DisplayName>roles</DisplayName>
+        <DataType>string</DataType>
+        <DefaultPartnerClaimTypes>
+          <Protocol Name="OAuth2" PartnerClaimType="roles" />
+          <Protocol Name="OpenIdConnect" PartnerClaimType="roles" />
+          <Protocol Name="SAML2" PartnerClaimType="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/roles" />
+        </DefaultPartnerClaimTypes>
+        <UserHelpText>Users roles</UserHelpText>
+        <UserInputType>TextBox</UserInputType>
+      </ClaimType>
+
       <ClaimType Id="surname">
         <DisplayName>Surname</DisplayName>
         <DataType>string</DataType>
@@ -288,28 +398,168 @@
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
 
-    </ClaimsSchema>
+       <ClaimType Id="AgreedToTermsAndConditions">
+        <DisplayName>Agree to the </DisplayName>
+        <DataType>string</DataType>
+        <UserInputType>CheckboxMultiSelect</UserInputType>
+        <Restriction>
+          <Enumeration Text="" Value="v16" />
+        </Restriction>
+      </ClaimType>
 
+      <!--Sample: This the the attribute that is stored in Azure AD B2C on the user's object-->
+      <ClaimType Id="extension_AgreedToTermsAndConditions">
+        <DisplayName>This is the current business Terms of Service version</DisplayName>
+        <DataType>string</DataType>
+        <AdminHelpText>This is the current business Terms of Service version</AdminHelpText>
+      </ClaimType>
+
+      <!--Sample: This is a claim created dynamically for logic purposes only. It is used to enforce your company's current TOS version-->
+      <ClaimType Id="policyTermsAndConditionsVersion">
+        <DisplayName>This is the current business Terms of Service version</DisplayName>
+        <DataType>string</DataType>
+        <AdminHelpText>This is the current business Terms of Service version</AdminHelpText>
+      </ClaimType>
+
+      <!--Sample: This is a claim created dynamically for logic purposes only. It is used to trigger an OrchestrationStep that presents a
+      TOS page to the end user during Sign-in flows only -->
+      <ClaimType Id="renewalTermsAndConditionsRequired">
+        <DisplayName>This variable states whether Terms and Conditions are required to be renewed</DisplayName>
+        <DataType>boolean</DataType>
+        <AdminHelpText>This variable states whether Terms and Conditions are required to be renewed</AdminHelpText>
+      </ClaimType>
+    </ClaimsSchema>
+    <Predicates>
+      <Predicate Id="LengthRange" Method="IsLengthRange">
+        <UserHelpText>The password must be between 8 and 256 characters.</UserHelpText>
+        <Parameters>
+          <Parameter Id="Minimum">8</Parameter>
+          <Parameter Id="Maximum">256</Parameter>
+        </Parameters>
+      </Predicate>
+      <Predicate Id="Lowercase" Method="IncludesCharacters">
+        <UserHelpText>a lowercase letter</UserHelpText>
+        <Parameters>
+          <Parameter Id="CharacterSet">a-z</Parameter>
+        </Parameters>
+      </Predicate>
+      <Predicate Id="Uppercase" Method="IncludesCharacters">
+        <UserHelpText>an uppercase letter</UserHelpText>
+        <Parameters>
+          <Parameter Id="CharacterSet">A-Z</Parameter>
+        </Parameters>
+      </Predicate>
+      <Predicate Id="Symbol" Method="IncludesCharacters">
+        <UserHelpText>a symbol</UserHelpText>
+        <Parameters>
+          <Parameter Id="CharacterSet">@#$%^&amp;*\-_+=[]{}|\\:',.?/`~"();!</Parameter>
+        </Parameters>
+      </Predicate>
+    </Predicates>
+    <PredicateValidations>
+    <PredicateValidation Id="CustomPassword">
+      <PredicateGroups>
+        <PredicateGroup Id="LengthGroup">
+          <PredicateReferences MatchAtLeast="1">
+            <PredicateReference Id="LengthRange" />
+          </PredicateReferences>
+        </PredicateGroup>
+        <PredicateGroup Id="CharacterClasses">
+          <UserHelpText>The password must have at least 3 of the following:</UserHelpText>
+          <PredicateReferences MatchAtLeast="3">
+            <PredicateReference Id="Lowercase" />
+            <PredicateReference Id="Uppercase" />
+            <PredicateReference Id="Symbol" />
+          </PredicateReferences>
+        </PredicateGroup>
+      </PredicateGroups>
+    </PredicateValidation>
+    </PredicateValidations>
     <ClaimsTransformations>
-      <ClaimsTransformation Id="CreateOtherMailsFromEmail" TransformationMethod="AddItemToStringCollection">
+      <ClaimsTransformation Id="SetIsNewPasswordEmail" TransformationMethod="setClaimsIfRegexMatch">
         <InputClaims>
-          <InputClaim ClaimTypeReferenceId="email" TransformationClaimType="item" />
-          <InputClaim ClaimTypeReferenceId="otherMails" TransformationClaimType="collection" />
-        </InputClaims>
-        <OutputClaims>
-          <OutputClaim ClaimTypeReferenceId="otherMails" TransformationClaimType="collection" />
-        </OutputClaims>
-      </ClaimsTransformation>
- 
-      <ClaimsTransformation Id="AssertAccountEnabledIsTrue" TransformationMethod="AssertBooleanClaimIsEqualToValue">
-        <InputClaims>
-          <InputClaim ClaimTypeReferenceId="accountEnabled" TransformationClaimType="inputClaim" />
+          <InputClaim ClaimTypeReferenceId="newPassword" TransformationClaimType="claimToMatch" />
         </InputClaims>
         <InputParameters>
-          <InputParameter Id="valueToCompareTo" DataType="boolean" Value="true" />
+          <InputParameter Id="matchTo" DataType="string" Value="^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$" />
         </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="isNewPasswordEmail" TransformationClaimType="regexCompareResultClaim" />
+        </OutputClaims>
       </ClaimsTransformation>
-    </ClaimsTransformations>
+        <ClaimsTransformation Id="GenerateSendGridRequestBody" TransformationMethod="GenerateJson">
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="email" TransformationClaimType="personalizations.0.to.0.email" />
+            <InputClaim ClaimTypeReferenceId="otp" TransformationClaimType="personalizations.0.dynamic_template_data.otp" />
+            <InputClaim ClaimTypeReferenceId="email" TransformationClaimType="personalizations.0.dynamic_template_data.email" />
+          </InputClaims>
+          <InputParameters>
+            <!-- Update the template_id value with the ID of your SendGrid template. -->
+            <InputParameter Id="template_id" DataType="string" Value="{Settings:SendGridTemplateId}"/>
+            <InputParameter Id="from.email" DataType="string" Value="{Settings:SendGridFromEmail}"/>
+            <!-- Update with a subject line appropriate for your organization. -->
+            <InputParameter Id="personalizations.0.dynamic_template_data.subject" DataType="string" Value="{Settings:SendGridEmailSubject}"/>
+          </InputParameters>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="sendGridReqBody" TransformationClaimType="outputClaim"/>
+          </OutputClaims>
+        </ClaimsTransformation>
+        <ClaimsTransformation Id="CreateOtherMailsFromEmail" TransformationMethod="AddItemToStringCollection">
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="email" TransformationClaimType="item" />
+            <InputClaim ClaimTypeReferenceId="otherMails" TransformationClaimType="collection" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="otherMails" TransformationClaimType="collection" />
+          </OutputClaims>
+        </ClaimsTransformation>
+  
+        <ClaimsTransformation Id="AssertAccountEnabledIsTrue" TransformationMethod="AssertBooleanClaimIsEqualToValue">
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="accountEnabled" TransformationClaimType="inputClaim" />
+          </InputClaims>
+          <InputParameters>
+            <InputParameter Id="valueToCompareTo" DataType="boolean" Value="true" />
+          </InputParameters>
+        </ClaimsTransformation>
+
+        <ClaimsTransformation Id="AssertNewPasswordIsEmailIsFalse" TransformationMethod="AssertBooleanClaimIsEqualToValue">
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="isNewPasswordEmail" TransformationClaimType="inputClaim" />
+          </InputClaims>
+          <InputParameters>
+            <InputParameter Id="valueToCompareTo" DataType="boolean" Value="false" />
+          </InputParameters>
+        </ClaimsTransformation>
+
+        <!--Sample: This returns a boolean value assigned to "renewalTermsAndConditionsRequired" to determine whether the user's last accepted TOS (extension_AgreedToTermsAndConditions)
+        equals to the current Company's TOS version (policyTermsAndConditionsVersion). If the two variables are not equal, it will write the value "true" in the renewalTermsAndConditionsRequired claim.-->
+        <ClaimsTransformation Id="IsTermsOfServiceRequired" TransformationMethod="CompareClaims">
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" TransformationClaimType="inputClaim1" />
+            <InputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" TransformationClaimType="inputClaim2" />
+          </InputClaims>
+          <InputParameters>
+            <InputParameter Id="operator" DataType="string" Value="NOT EQUAL" />
+            <InputParameter Id="ignoreCase" DataType="string" Value="true" />
+          </InputParameters>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="renewalTermsAndConditionsRequired" TransformationClaimType="outputClaim" />
+          </OutputClaims>
+        </ClaimsTransformation>
+
+        <!--Sample: This verifies whether or not the TOS button has been selected by checking if the correct variable has been 
+        assigned to the AgreedToTermsAndConditions button. If not selected, then "did not accept" value will be assigned to it.-->
+        <ClaimsTransformation Id="AssertTermsAndConditionsMustBeChecked" TransformationMethod="AssertStringClaimsAreEqual">
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" TransformationClaimType="inputClaim1" />
+            <InputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" TransformationClaimType="inputClaim2" />
+          </InputClaims>
+          <InputParameters>
+            <InputParameter Id="stringComparison" DataType="string" Value="ordinalIgnoreCase" />
+          </InputParameters>
+        </ClaimsTransformation>
+      </ClaimsTransformations>
 
     <ClientDefinitions>
       <ClientDefinition Id="DefaultWeb">
@@ -321,9 +571,8 @@
 
       <!-- This content definition is to render an error page that displays unhandled errors. -->
       <ContentDefinition Id="api.error">
-        <LoadUri>~/tenant/templates/AzureBlue/exception.cshtml</LoadUri>
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:globalexception:1.1.0</DataUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:globalexception:1.2.0</DataUri>
         <Metadata>
           <Item Key="DisplayName">Error page</Item>
         </Metadata>
@@ -332,7 +581,7 @@
       <ContentDefinition Id="api.idpselections">
         <LoadUri>~/tenant/templates/AzureBlue/idpSelector.cshtml</LoadUri>
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:idpselection:1.0.0</DataUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:providerselection:1.2.0</DataUri>
         <Metadata>
           <Item Key="DisplayName">Idp selection page</Item>
           <Item Key="language.intro">Sign in</Item>
@@ -342,7 +591,7 @@
       <ContentDefinition Id="api.idpselections.signup">
         <LoadUri>~/tenant/templates/AzureBlue/idpSelector.cshtml</LoadUri>
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:idpselection:1.0.0</DataUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:providerselection:1.2.0</DataUri>
         <Metadata>
           <Item Key="DisplayName">Idp selection page</Item>
           <Item Key="language.intro">Sign up</Item>
@@ -352,7 +601,7 @@
       <ContentDefinition Id="api.signuporsignin">
         <LoadUri>~/tenant/templates/AzureBlue/unified.cshtml</LoadUri>
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:unifiedssp:1.0.0</DataUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:unifiedssp:1.2.0</DataUri>
         <Metadata>
           <Item Key="DisplayName">Signin and Signup</Item>
         </Metadata>
@@ -361,7 +610,7 @@
       <ContentDefinition Id="api.selfasserted">
         <LoadUri>~/tenant/templates/AzureBlue/selfAsserted.cshtml</LoadUri>
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:selfasserted:1.1.0</DataUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:1.2.0</DataUri>
         <Metadata>
           <Item Key="DisplayName">Collect information from user page</Item>
         </Metadata>
@@ -370,7 +619,7 @@
       <ContentDefinition Id="api.selfasserted.profileupdate">
         <LoadUri>~/tenant/templates/AzureBlue/selfAsserted.cshtml</LoadUri>
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:selfasserted:1.1.0</DataUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:1.2.0</DataUri>
         <Metadata>
           <Item Key="DisplayName">Collect information from user page</Item>
         </Metadata>
@@ -379,7 +628,7 @@
       <ContentDefinition Id="api.localaccountsignup">
         <LoadUri>~/tenant/templates/AzureBlue/selfAsserted.cshtml</LoadUri>
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:selfasserted:1.1.0</DataUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:1.2.0</DataUri>
         <Metadata>
           <Item Key="DisplayName">Local account sign up page</Item>
         </Metadata>
@@ -388,13 +637,37 @@
       <ContentDefinition Id="api.localaccountpasswordreset">
         <LoadUri>~/tenant/templates/AzureBlue/selfAsserted.cshtml</LoadUri>
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
-        <DataUri>urn:com:microsoft:aad:b2c:elements:selfasserted:1.1.0</DataUri>
+        <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:1.2.0</DataUri>
         <Metadata>
           <Item Key="DisplayName">Local account change password page</Item>
         </Metadata>
       </ContentDefinition>
 
     </ContentDefinitions>
+     <DisplayControls>
+      <DisplayControl Id="emailVerificationControl" UserInterfaceControlType="VerificationControl">
+        <DisplayClaims>
+          <DisplayClaim ClaimTypeReferenceId="email" Required="true" />
+          <DisplayClaim ClaimTypeReferenceId="verificationCode" ControlClaimType="VerificationCode" Required="true" />
+        </DisplayClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="email" />
+        </OutputClaims>
+        <Actions>
+          <Action Id="SendCode">
+            <ValidationClaimsExchange>
+              <ValidationClaimsExchangeTechnicalProfile TechnicalProfileReferenceId="GenerateOtp" />
+              <ValidationClaimsExchangeTechnicalProfile TechnicalProfileReferenceId="SendGrid" />
+            </ValidationClaimsExchange>
+          </Action>
+          <Action Id="VerifyCode">
+            <ValidationClaimsExchange>
+              <ValidationClaimsExchangeTechnicalProfile TechnicalProfileReferenceId="VerifyOtp" />
+            </ValidationClaimsExchange>
+          </Action>
+        </Actions>
+      </DisplayControl>
+    </DisplayControls>
   </BuildingBlocks>
 
   <!--
@@ -402,7 +675,185 @@
         in this section, then it cannot be used in a technical policy.
     -->
   <ClaimsProviders>
- 
+    
+      <ClaimsProvider>
+      <DisplayName>Claims Transformation</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="ClaimsTransformation-SetIsNewPasswordEmail">
+          <DisplayName>Set Is new password valid</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="newPassword" DefaultValue=""  />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="isNewPasswordEmail" DefaultValue="true"/>
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="SetIsNewPasswordEmail" />
+          </OutputClaimsTransformations>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+    
+
+    <ClaimsProvider>
+      <DisplayName>REST APIs</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="REST-ValidateEmail">
+          <DisplayName>Fetch personal details for user</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:RestApiForValidateEmail}</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <!-- Set AuthenticationType to Basic or ClientCertificate in production environments -->
+            <Item Key="AuthenticationType">ClientCertificate</Item>
+            <!-- REMOVE the following line in production environments -->
+            <Item Key="AllowInsecureAuthInProduction">true</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="ClientCertificate" StorageReferenceId="{Settings:RestAPICertificateAppSecret}" />
+          </CryptographicKeys>
+          <InputClaims>
+            <!-- Claims sent to your REST API -->
+            <InputClaim ClaimTypeReferenceId="email" />
+          </InputClaims>
+          <OutputClaims>
+            <!-- Claims parsed from your REST API -->
+            <OutputClaim ClaimTypeReferenceId="emailvalidated" PartnerClaimType="validated" DefaultValue="false"/>
+            <OutputClaim ClaimTypeReferenceId="emailcount" PartnerClaimType="count" DefaultValue="0"/>
+          </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+    <ClaimsProvider>
+      <DisplayName>REST APIs</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="REST-ValidateUserProfileWithSignInName">
+          <DisplayName>Fetch personal details for user</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:RestApiForValidateUserProfile}</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <!-- Set AuthenticationType to Basic or ClientCertificate in production environments -->
+            <Item Key="AuthenticationType">ClientCertificate</Item>
+            <!-- REMOVE the following line in production environments -->
+            <Item Key="AllowInsecureAuthInProduction">true</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="ClientCertificate" StorageReferenceId="{Settings:RestAPICertificateAppSecret}" />
+          </CryptographicKeys>
+          <InputClaims>
+            <!-- Claims sent to your REST API -->
+            <InputClaim ClaimTypeReferenceId="signInName" PartnerClaimType="email"/>
+            <InputClaim ClaimTypeReferenceId="objectId" />
+          </InputClaims>
+          <OutputClaims>
+            <!-- Claims parsed from your REST API -->
+            <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="firstName" DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="surName" PartnerClaimType="lastName" DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="roles" PartnerClaimType="roles" DefaultValue=""/>
+          </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+    <ClaimsProvider>
+      <DisplayName>REST APIs</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="REST-ValidateUserProfileWithEmail">
+          <DisplayName>Fetch personal details for user</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">{Settings:RestApiForValidateUserProfile}</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <!-- Set AuthenticationType to Basic or ClientCertificate in production environments -->
+            <Item Key="AuthenticationType">ClientCertificate</Item>
+            <!-- REMOVE the following line in production environments -->
+            <Item Key="AllowInsecureAuthInProduction">true</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="ClientCertificate" StorageReferenceId="{Settings:RestAPICertificateAppSecret}" />
+          </CryptographicKeys>
+          <InputClaims>
+            <!-- Claims sent to your REST API -->
+            <InputClaim ClaimTypeReferenceId="email"/>
+            <InputClaim ClaimTypeReferenceId="objectId" />
+          </InputClaims>
+          <OutputClaims>
+            <!-- Claims parsed from your REST API -->
+            <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="firstName" DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="surName" PartnerClaimType="lastName" DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="roles" PartnerClaimType="roles" DefaultValue=""/>
+          </OutputClaims>
+          <UseTechnicalProfileForSessionManagement ReferenceId="SM-Noop" />
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+    <ClaimsProvider>
+      <DisplayName>RestfulProvider</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="SendGrid">
+          <DisplayName>Use SendGrid's email API to send the code the the user</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ServiceUrl">https://api.sendgrid.com/v3/mail/send</Item>
+            <Item Key="AuthenticationType">Bearer</Item>
+            <Item Key="SendClaimsIn">Body</Item>
+            <Item Key="ClaimUsedForRequestPayload">sendGridReqBody</Item>
+          </Metadata>
+          <CryptographicKeys>
+            <Key Id="BearerAuthenticationToken" StorageReferenceId="B2C_1A_SendGridSecret" />
+          </CryptographicKeys>
+          <InputClaimsTransformations>
+            <InputClaimsTransformation ReferenceId="GenerateSendGridRequestBody" />
+          </InputClaimsTransformations>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="sendGridReqBody" />
+          </InputClaims>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+    <ClaimsProvider>
+      <DisplayName>One time password technical profiles</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="GenerateOtp">
+          <DisplayName>Generate one time password</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.OneTimePasswordProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="Operation">GenerateCode</Item>
+            <Item Key="CodeExpirationInSeconds">1200</Item>
+            <Item Key="CodeLength">6</Item>
+            <Item Key="CharacterSet">0-9</Item>
+            <Item Key="ReuseSameCode">true</Item>
+            <Item Key="MaxNumAttempts">5</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="email" PartnerClaimType="identifier" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="otp" PartnerClaimType="otpGenerated" />
+          </OutputClaims>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="VerifyOtp">
+          <DisplayName>Verify one time password</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.OneTimePasswordProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="Operation">VerifyCode</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="email" PartnerClaimType="identifier" />
+            <InputClaim ClaimTypeReferenceId="verificationCode" PartnerClaimType="otpToVerify" />
+          </InputClaims>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
     <ClaimsProvider>
       <DisplayName>Local Account SignIn</DisplayName>
       <TechnicalProfiles>
@@ -435,8 +886,6 @@
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="oid" />
             <OutputClaim ClaimTypeReferenceId="tenantId" PartnerClaimType="tid" />
-            <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="given_name" />
-            <OutputClaim ClaimTypeReferenceId="surName" PartnerClaimType="family_name" />
             <OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
             <OutputClaim ClaimTypeReferenceId="userPrincipalName" PartnerClaimType="upn" />
             <OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="localAccountAuthentication" />
@@ -458,8 +907,8 @@
                 Use the MS Docs for guidance: https://docs.microsoft.com/en-us/azure/active-directory-b2c/active-directory-b2c-create-custom-attributes-profile-edit-custom -->
 
           <Metadata>
-            <Item Key="ApplicationObjectId">e0971b24-fd26-4a65-a7f0-f058ed260003</Item>
-            <Item Key="ClientId">845cea86-4a21-406a-b5ef-7abb75b8b5f9</Item>
+            <Item Key="ApplicationObjectId">{Settings:ExtensionClientId}</Item>
+            <Item Key="ClientId">{Settings:ApplicationObjectId}</Item>
           </Metadata>
 
           <CryptographicKeys>
@@ -488,7 +937,7 @@
             <PersistedClaim ClaimTypeReferenceId="newPassword" PartnerClaimType="password"/>
             <PersistedClaim ClaimTypeReferenceId="displayName" DefaultValue="unknown" />
             <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration" />
-  
+          
             <!-- Optional claims. You would add optional here -->
             <!-- 
               <PersistedClaim ClaimTypeReferenceId="givenName" />
@@ -546,7 +995,6 @@
           <PersistedClaims>
             <PersistedClaim ClaimTypeReferenceId="objectId" />
             <PersistedClaim ClaimTypeReferenceId="newPassword" PartnerClaimType="password"/>
-  
           </PersistedClaims>
           <IncludeTechnicalProfile ReferenceId="AAD-Common" />
         </TechnicalProfile>
@@ -636,6 +1084,75 @@
     </ClaimsProvider>
 
     <ClaimsProvider>
+      <DisplayName>Write Updated Terms of Service</DisplayName>
+      <TechnicalProfiles>
+
+        <!--Sample:Verifies TOS Button was clicked before hitting Submit. If user does not, it tells the previous TechnicalProfile to render
+        a custom error.-->
+        <TechnicalProfile Id="VerifyTermsAndConditionsWereAccepted">
+          <DisplayName>Verifies TOS has been Accepted </DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" DefaultValue=""/>
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="AssertTermsAndConditionsMustBeChecked" />
+          </OutputClaimsTransformations>
+        </TechnicalProfile>
+
+
+      <TechnicalProfile Id="VerifyNewPasswordDoesNotContainEmail">
+          <DisplayName>Verifies new password does not contain email.</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="isNewPasswordEmail" DefaultValue="true"/>
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="AssertNewPasswordIsEmailIsFalse" />
+          </OutputClaimsTransformations>
+        </TechnicalProfile>
+
+        <!--Sample: ValidationTechnicalProfile that updates the  authenticated user's renewal TOS into the Azure AD B2C directory-->
+        <TechnicalProfile Id="AAD-UserWriteProfileUsingObjectIdUpdateTOU">
+          <Metadata>
+            <Item Key="Operation">Write</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalAlreadyExists">false</Item>
+            <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">true</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+          </InputClaims>
+          <PersistedClaims>
+            <PersistedClaim ClaimTypeReferenceId="objectId" />
+            <!--Sample: Takes the value stored in "AgreedToTermsAndConditions" and writes to the known B2C directory extension "extension_AgreedToTermsAndConditions"-->
+            <PersistedClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" PartnerClaimType="extension_AgreedToTermsAndConditions" />
+          </PersistedClaims>
+          <IncludeTechnicalProfile ReferenceId="AAD-Common" />
+        </TechnicalProfile>
+
+        <!--Sample: CheckTOSrequire is a Sign-in auth flow check that sets whether a TOS has changed since last TOS acceptance.
+        A boolean variable is set onto "renewalTermsAndConditionsRequired" claim that is latered used in an OrchestrationStep to ask the user to accept new TOS -->
+        <TechnicalProfile Id="CheckTermsAndConditionsDuringSignIn">
+          <DisplayName> Check TOS Requirement </DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" Required="true" />
+            <InputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" Required="true" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="renewalTermsAndConditionsRequired" />
+            <OutputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" />
+            <OutputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" />
+          </OutputClaims>
+          <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="IsTermsOfServiceRequired" />
+          </OutputClaimsTransformations>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+    <ClaimsProvider>
       <DisplayName>Local Account</DisplayName>
       <TechnicalProfiles>
 
@@ -645,14 +1162,29 @@
           <Metadata>
             <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
             <Item Key="ContentDefinitionReferenceId">api.localaccountsignup</Item>
-            <Item Key="language.button_continue">Create</Item>
+            <Item Key="language.button_continue">Create</Item> 
+            <!--OTP validation error messages-->
+            <Item Key="UserMessageIfSessionDoesNotExist">You have exceed the maximum time allowed.</Item>
+            <Item Key="UserMessageIfMaxRetryAttempted">You have exceed the number of retries allowed.</Item>
+            <Item Key="UserMessageIfInvalidCode">You have entered the wrong code.</Item>
+            <Item Key="UserMessageIfSessionConflict">Cannot verify the code, please try again later.</Item>
+              <!--Sample action required: Customize your own error message if user attempts to bypass TOS-->
+            <Item Key="UserMessageIfClaimsTransformationStringsAreNotEqual">Terms and conditions must be accepted in order to signin.</Item>
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
           </CryptographicKeys>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="email" />
+            <!--Please note this will have to change when the policy version changes-->
+            <InputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" DefaultValue="{Settings:PolicyTermsAndConditionsVersion}" />
           </InputClaims>
+          <DisplayClaims>
+            <DisplayClaim DisplayControlReferenceId="emailVerificationControl" />
+            <DisplayClaim ClaimTypeReferenceId="newPassword" Required="true" />
+            <DisplayClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
+            <DisplayClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" Required="true" />
+          </DisplayClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="objectId" />
             <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="Verified.Email" Required="true" />
@@ -661,11 +1193,15 @@
             <OutputClaim ClaimTypeReferenceId="executed-SelfAsserted-Input" DefaultValue="true" />
             <OutputClaim ClaimTypeReferenceId="authenticationSource" />
             <OutputClaim ClaimTypeReferenceId="newUser" />
-
-            <!-- Optional claims, to be collected from the user -->
-            <!-- <OutputClaim ClaimTypeReferenceId="displayName" />
-            <OutputClaim ClaimTypeReferenceId="givenName" />
-            <OutputClaim ClaimTypeReferenceId="surName" /> -->
+            <OutputClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" DefaultValue="true" Required="true" />
+            <OutputClaim ClaimTypeReferenceId="renewalTermsAndConditionsRequired" DefaultValue="true" />
+            <OutputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" DefaultValue="v16" />
+            <OutputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="emailvalidated" DefaultValue="false"/>
+            <OutputClaim ClaimTypeReferenceId="emailcount" DefaultValue="0"/>
+            <OutputClaim ClaimTypeReferenceId="givenName" DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="surName"  DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="roles" DefaultValue=""/>
           </OutputClaims>
           <ValidationTechnicalProfiles>
             <ValidationTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail" />
@@ -707,17 +1243,25 @@
             <Item Key="IpAddressClaimReferenceId">IpAddress</Item>
             <Item Key="ContentDefinitionReferenceId">api.localaccountpasswordreset</Item>
             <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">Your account has been locked. Contact your support person to unlock it, then try again.</Item>
+              
+            <!--OTP validation error messages-->
+            <Item Key="UserMessageIfSessionDoesNotExist">You have exceed the maximum time allowed.</Item>
+            <Item Key="UserMessageIfMaxRetryAttempted">You have exceed the number of retries allowed.</Item>
+            <Item Key="UserMessageIfInvalidCode">You have entered the wrong code.</Item>
+            <Item Key="UserMessageIfSessionConflict">Cannot verify the code, please try again later.</Item>
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
           </CryptographicKeys>
           <IncludeInSso>false</IncludeInSso>
+          <DisplayClaims>
+            <DisplayClaim DisplayControlReferenceId="emailVerificationControl" />
+          </DisplayClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="Verified.Email" Required="true" />
             <OutputClaim ClaimTypeReferenceId="objectId" />
             <OutputClaim ClaimTypeReferenceId="userPrincipalName" />
             <OutputClaim ClaimTypeReferenceId="authenticationSource" />
-  
           </OutputClaims>
           <ValidationTechnicalProfiles>
             <ValidationTechnicalProfile ReferenceId="AAD-UserReadUsingEmailAddress" />
@@ -735,13 +1279,18 @@
           </CryptographicKeys>
           <InputClaims>
             <InputClaim ClaimTypeReferenceId="objectId" />
-  
           </InputClaims>
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="newPassword" Required="true" />
             <OutputClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
+            <OutputClaim ClaimTypeReferenceId="roles" DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="givenName"  DefaultValue=""/>
+            <OutputClaim ClaimTypeReferenceId="surName"  DefaultValue=""/>
           </OutputClaims>
           <ValidationTechnicalProfiles>
+            <!--ValidationTechnicalProfile ReferenceId="ClaimsTransformation-SetIsNewPasswordEmail" />
+            <ValidationTechnicalProfile ReferenceId="VerifyNewPasswordDoesNotContainEmail" /--> 
+            <ValidationTechnicalProfile ReferenceId="REST-ValidateUserProfileWithEmail" /> 
             <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId" />
           </ValidationTechnicalProfiles>
         </TechnicalProfile>
@@ -771,6 +1320,17 @@
           <OutputClaims>
             <OutputClaim ClaimTypeReferenceId="objectIdFromSession" DefaultValue="true"/>
           </OutputClaims>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="SM-SocialLogin">
+          <DisplayName>Session Mananagement Provider</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.SSO.ExternalLoginSSOSessionProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="AlwaysFetchClaimsFromProvider">true</Item>
+          </Metadata>
+          <PersistedClaims>
+            <PersistedClaim ClaimTypeReferenceId="AlternativeSecurityId" />
+          </PersistedClaims>
         </TechnicalProfile>
  
       </TechnicalProfiles>
@@ -880,7 +1440,6 @@
       </OrchestrationSteps>
       <ClientDefinition ReferenceId="DefaultWeb" />
     </UserJourney>
-
     <UserJourney Id="PasswordReset">
       <OrchestrationSteps>
         <OrchestrationStep Order="1" Type="ClaimsExchange">

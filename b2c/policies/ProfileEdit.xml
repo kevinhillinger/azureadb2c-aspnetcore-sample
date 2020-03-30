@@ -4,13 +4,13 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
   PolicySchemaVersion="0.3.0.0"
-  TenantId="idhack007.onmicrosoft.com"
-  PolicyId="B2C_1A_ProfileEdit"
-  PublicPolicyUri="http://idhack007.onmicrosoft.com/B2C_1A_ProfileEdit">
+  TenantId="{Settings:Tenant}"
+  PolicyId="{Settings:BasePolicy}ProfileEdit"
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}ProfileEdit">
 
   <BasePolicy>
-    <TenantId>idhack007.onmicrosoft.com</TenantId>
-    <PolicyId>B2C_1A_TrustFrameworkExtensions</PolicyId>
+    <TenantId>{Settings:Tenant}</TenantId>
+    <PolicyId>{Settings:BasePolicy}TrustFrameworkExtensions</PolicyId>
   </BasePolicy>
 
   <RelyingParty>
@@ -21,6 +21,9 @@
       <OutputClaims>
         <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub"/>
         <OutputClaim ClaimTypeReferenceId="tenantId" AlwaysUseDefaultValue="true" DefaultValue="{Policy:TenantObjectId}" />
+        <OutputClaim ClaimTypeReferenceId="roles" DefaultValue=""/>
+        <OutputClaim ClaimTypeReferenceId="givenName"  DefaultValue=""/>
+        <OutputClaim ClaimTypeReferenceId="surName"  DefaultValue=""/>
       </OutputClaims>
       <SubjectNamingInfo ClaimType="sub" />
     </TechnicalProfile>
