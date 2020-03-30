@@ -26,12 +26,22 @@ namespace SampleWebApp.B2c.Controllers
                 return NotFound();
             }
 
-            return Ok(new UserProfileResponse() { FirstName = "Floyd", LastName = "Weatherman", Email = "floydweather@contoso.net"});
+            return Ok(new UserProfileResponse() { 
+                FirstName = userProfile.FirstName, 
+                LastName = userProfile.LastName, 
+                Email =userProfile.Email
+                });
         }
 
         private bool TryGetUserProfile(string email, out UserProfile userProfile) 
         {
-            userProfile = new UserProfile();
+            userProfile = new UserProfile
+            {
+                FirstName = "Floyd", 
+                LastName = "Weatherman", 
+                Email = email
+            };
+            
             return true;
         }
     }

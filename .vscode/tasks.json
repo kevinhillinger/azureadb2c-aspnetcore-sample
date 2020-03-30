@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/app/backend/SampleWebApp.csproj",
+                "${workspaceFolder}/app/backend/SampleWebApp/SampleWebApp.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/app/backend/SampleWebApp.csproj",
+                "${workspaceFolder}/app/backend/SampleWebApp/SampleWebApp.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +32,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/app/backend/SampleWebApp.csproj",
+                "${workspaceFolder}/app/backend/SampleWebApp/SampleWebApp.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -44,7 +44,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/app/backend",
+                "${workspaceFolder}/app/backend/SampleWebApp",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -56,7 +56,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/app/backend",
+                "${workspaceFolder}/app/backend/SampleWebApp",
                 "--configuration",
                 "Release",
                 "/property:GenerateFullPaths=true",
