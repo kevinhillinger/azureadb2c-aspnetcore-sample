@@ -24,15 +24,21 @@ import { AuthService } from './security/auth.service';
   ],
   imports: [
     MsalModule.forRoot({ 
-      clientID: '1f16026e-109a-4f94-8985-83fd0fcd10a6',
-      cacheLocation : "sessionStorage",
-      storeAuthStateInCookie: true,
-      navigateToLoginRequestUrl : false,
-      redirectUri: "https://localhost:4201/",
-      postLogoutRedirectUri: "https://localhost:4201/",
+      auth: {
+        clientId: '1f16026e-109a-4f94-8985-83fd0fcd10a6',
+        navigateToLoginRequestUrl : false,
+        redirectUri: "https://localhost:4201/",
+        postLogoutRedirectUri: "https://localhost:4201/",
+        validateAuthority: false, //must be false to support B2C
+        authority: "https://idhack007.b2clogin.com/tfp/idhack007.onmicrosoft.com/B2C_1A_signup_signin/" //default authority is signin signup user flow
+      },
+      cache: {
+        cacheLocation : "sessionStorage",
+        storeAuthStateInCookie: true
+      }
+    },
+    {
       popUp: false, 
-      validateAuthority: false, //must be false to support B2C
-      authority: "https://idhack007.b2clogin.com/tfp/idhack007.onmicrosoft.com/B2C_1A_signup_signin/", //default authority is signin signup user flow
       consentScopes: ["https://idhack007.onmicrosoft.com/webapp-sample-api/weatherforecast.read"]
     }),
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
