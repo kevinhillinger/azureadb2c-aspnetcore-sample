@@ -35,7 +35,7 @@ namespace SampleWebApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, IOptions<List<CorsPolicyConfig>> corsOptions)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory, IOptions<CorsPoliciesConfig> corsPolicies)
         {
             if (env.IsDevelopment())
             {
@@ -51,10 +51,16 @@ namespace SampleWebApp
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCertificateForwarding();
+
+              app.UseCors(builder => {
+               builder.SetIsOriginAllowed(x => _ = true).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+               corsPolicies.Value.ForEach(p => {
+                   builder.WithOrigins(p.AllowedOrigins.ToArray());
+               });
+           });
+
             app.UseAuthentication();
             app.UseAuthorization();
-            
-            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
