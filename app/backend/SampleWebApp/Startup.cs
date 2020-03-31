@@ -69,7 +69,7 @@ namespace SampleWebApp
         public static void AddConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<B2cAuthenticationConfig>(configuration.GetSection(B2cAuthenticationConfig.ConfigurationSectionName));
-            services.Configure<CorsPolicyConfig>(configuration.GetSection(CorsPolicyConfig.ConfigurationSectionName));
+            services.Configure<CorsPoliciesConfig>(configuration.GetSection(CorsPoliciesConfig.ConfigurationSectionName));
             services.Configure<CertificatesConfig>(configuration.GetSection(CertificatesConfig.ConfigurationSectionName));
         }
     }

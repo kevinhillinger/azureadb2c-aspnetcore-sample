@@ -10,7 +10,7 @@ namespace SampleWebApp.Security
     static class CorsPolicyExtensions
     {
         public static void AddCorsPolicies(this IServiceCollection services) {
-            var policies = services.BuildServiceProvider().GetService<IOptions<List<CorsPolicyConfig>>>().Value;
+            var policies = services.BuildServiceProvider().GetService<IOptions<CorsPoliciesConfig>>().Value;
             services.AddCors(options => policies.ForEach(options.AddPolicy));
         }
         
