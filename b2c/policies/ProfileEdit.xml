@@ -5,12 +5,12 @@
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
   PolicySchemaVersion="0.3.0.0"
   TenantId="{Settings:Tenant}"
-  PolicyId="{Settings:BasePolicy}ProfileEdit"
-  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}ProfileEdit">
+  PolicyId="{Settings:PolicyPrefix}ProfileEdit"
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:PolicyPrefix}ProfileEdit">
 
   <BasePolicy>
     <TenantId>{Settings:Tenant}</TenantId>
-    <PolicyId>{Settings:BasePolicy}TrustFrameworkExtensions</PolicyId>
+    <PolicyId>{Settings:PolicyPrefix}TrustFrameworkExtensions</PolicyId>
   </BasePolicy>
 
   <RelyingParty>

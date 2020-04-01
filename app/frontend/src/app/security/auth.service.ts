@@ -10,12 +10,17 @@ interface MSALError {
   scopes: string;
 }
 
+enum MsalTopic {
+  loginFailure = "msal:loginFailure",
+  loginSuccess = "msal:loginSuccess",
+  acquireTokenSuccess = "msal:acquireTokenSuccess",
+  acquirTokenFailure = "msal:acquireTokenFailure"
+}
+
 @Injectable()
 export class AuthService implements OnDestroy {
   private isAuthenticated: boolean;
   private readonly authorityBaseUrl = "https://idhack007.b2clogin.com/tfp/idhack007.onmicrosoft.com/";
-  private readonly loginFailureTopic = "msal:loginFailure";
-  private readonly loginSuccessTopic = "msal:loginSuccess";
   private readonly forgotPasswordCode = "AADB2C90118:";
 
   private readonly subscriptions = new Map();
@@ -25,13 +30,16 @@ export class AuthService implements OnDestroy {
   }
 
   getIsAuthenticated() {
+    console.log(this.msalService.getAccount());
+    this.msalService.acquireTokenSilent({
+      scopes: this.scopes,
+      redirectUri: this.msalService.getRedirectUri()
+    });
     return this.isAuthenticated;
   }
 
   register() {
-
-    this.subscriptions.set(this.loginFailureTopic, this.broadcastService.subscribe(this.loginFailureTopic, this.loginFailureHandler.bind(this)));
-    this.subscriptions.set(this.loginSuccessTopic, this.broadcastService.subscribe(this.loginSuccessTopic, this.loginSuccessHandler.bind(this)));
+    this.subscribeToMsalTopics();
 
     let scopes = this.scopes;
 
@@ -41,9 +49,7 @@ export class AuthService implements OnDestroy {
         return;
       }
       console.log("Redirect success: ", redirectResponse);
-
     });
-
   }
 
   signIn() {
@@ -61,19 +67,22 @@ export class AuthService implements OnDestroy {
     this.handleForgotPassword();
   }
 
+  private acquireTokenSuccessHandler(payload) {
+    console.log("acquire token success " + JSON.stringify(payload));
+  }
+
+  private acquireTokenFailureHandler(payload) {
+    console.log("acquire token failure " + JSON.stringify(payload));
+  }
+
   private loginSuccessHandler(payload) {
     this.isAuthenticated = true;
-
-    console.log(payload);
-    console.log("login success.");
-    
+    console.log("login success " + JSON.stringify(payload));
   }
 
   private loginFailureHandler(payload: MSALError) {
     this.isAuthenticated = false;
-
-    console.log(payload);
-    console.log("login failure.");
+    console.log("login failure " + JSON.stringify(payload));
     
     // check if we're getting a redirect back from B2C to handle the password reset. If we are, handle it.
     if (this.isForgotPasswordFlow(payload)) {
@@ -95,11 +104,25 @@ export class AuthService implements OnDestroy {
     this.msalService.loginRedirect();
   }
 
+  private subscribeToMsalTopics() {
+    for (let topic in MsalTopic) {
+        let handlerName = topic.split(':')[1] + "Handler";
+        let handler = this[handlerName];
+
+        if (handler) {
+          let subscription = this.broadcastService.subscribe(topic, handler);
+          this.subscriptions.set(topic, subscription);
+        }
+    }
+  }
+
   private disposeSubscriptions() {
     this.broadcastService.getMSALSubject().next(1);
 
-    this.disposeSubscription(this.loginFailureTopic);
-    this.disposeSubscription(this.loginSuccessTopic);
+    for(let topic in this.subscriptions.keys) {
+      this.disposeSubscription(topic);
+    }
+    this.subscriptions.clear();
   }
 
   private disposeSubscription(topic: string) {

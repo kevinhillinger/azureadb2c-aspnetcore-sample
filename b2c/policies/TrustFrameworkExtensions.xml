@@ -5,12 +5,12 @@
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" 
   PolicySchemaVersion="0.3.0.0" 
   TenantId="{Settings:Tenant}"
-  PolicyId="{Settings:BasePolicy}TrustFrameworkExtensions"
-  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}TrustFrameworkExtensions">
+  PolicyId="{Settings:PolicyPrefix}TrustFrameworkExtensions"
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:PolicyPrefix}TrustFrameworkExtensions">
   
   <BasePolicy>
     <TenantId>{Settings:Tenant}</TenantId>
-    <PolicyId>{Settings:BasePolicy}TrustFrameworkBase</PolicyId>
+    <PolicyId>{Settings:PolicyPrefix}TrustFrameworkBase</PolicyId>
   </BasePolicy>
   <BuildingBlocks>
     <ClaimsSchema>
@@ -333,7 +333,7 @@
         <Item Key="UsePolicyInRedirectUri">false</Item>
       </Metadata>
       <CryptographicKeys>
-        <Key Id="client_secret" StorageReferenceId="{Settings:ExternalTenantAppSecret}"/>
+        <Key Id="client_secret" StorageReferenceId="{Settings:ExternalTenantClientSecretStorageReferenceId}"/>
       </CryptographicKeys>
       <OutputClaims>
         <OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="oid"/>

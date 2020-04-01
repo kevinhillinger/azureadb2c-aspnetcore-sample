@@ -238,8 +238,8 @@ orleans.codegen.cs
 # (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
 #bower_components/
 
-# RIA/Silverlight projects
-Generated_Code/
+# B2C Custom Policies Build
+b2c/policies/Environments/
 
 # Backup & report files from converting an old project file
 # to a newer Visual Studio version. Backup files are not needed,

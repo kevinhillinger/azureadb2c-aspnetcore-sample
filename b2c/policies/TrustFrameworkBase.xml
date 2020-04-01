@@ -5,8 +5,8 @@
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
   PolicySchemaVersion="0.3.0.0"
   TenantId="{Settings:Tenant}"
-  PolicyId="{Settings:BasePolicy}TrustFrameworkBase"
-  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}TrustFrameworkBase">
+  PolicyId="{Settings:PolicyPrefix}TrustFrameworkBase"
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:PolicyPrefix}TrustFrameworkBase">
 
   <BuildingBlocks>
     <ClaimsSchema>
@@ -29,10 +29,12 @@
         <DisplayName>Secondary One-time password</DisplayName>
         <DataType>string</DataType>
       </ClaimType>
+      
       <ClaimType Id="sendGridReqBody">
         <DisplayName>SendGrid request body</DisplayName>
         <DataType>string</DataType>
       </ClaimType>
+
       <ClaimType Id="VerificationCode">
         <DisplayName>Secondary Verification Code</DisplayName>
         <DataType>string</DataType>
@@ -795,7 +797,7 @@
           <DisplayName>Fetch personal details for user</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
-            <Item Key="ServiceUrl">{Settings:RestApiForValidateEmail}</Item>
+            <Item Key="ServiceUrl">{Settings:ApiUrlValidateEmail}</Item>
             <Item Key="SendClaimsIn">Body</Item>
             <!-- Set AuthenticationType to Basic or ClientCertificate in production environments -->
             <Item Key="AuthenticationType">ClientCertificate</Item>
@@ -803,7 +805,7 @@
             <Item Key="AllowInsecureAuthInProduction">true</Item>
           </Metadata>
           <CryptographicKeys>
-            <Key Id="ClientCertificate" StorageReferenceId="{Settings:RestAPICertificateAppSecret}" />
+            <Key Id="ClientCertificate" StorageReferenceId="{Settings:ApiClientCertificateStorageReferenceId}" />
           </CryptographicKeys>
           <InputClaims>
             <!-- Claims sent to your REST API -->
@@ -825,7 +827,7 @@
           <DisplayName>Fetch personal details for user</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
-            <Item Key="ServiceUrl">{Settings:RestApiForValidateUserProfile}</Item>
+            <Item Key="ServiceUrl">{Settings:ApiUrlUserProfile}</Item>
             <Item Key="SendClaimsIn">Body</Item>
             <!-- Set AuthenticationType to Basic or ClientCertificate in production environments -->
             <Item Key="AuthenticationType">ClientCertificate</Item>
@@ -833,7 +835,7 @@
             <Item Key="AllowInsecureAuthInProduction">true</Item>
           </Metadata>
           <CryptographicKeys>
-            <Key Id="ClientCertificate" StorageReferenceId="{Settings:RestAPICertificateAppSecret}" />
+            <Key Id="ClientCertificate" StorageReferenceId="{Settings:ApiClientCertificateStorageReferenceId}" />
           </CryptographicKeys>
           <InputClaims>
             <!-- Claims sent to your REST API -->
@@ -860,7 +862,7 @@
           <DisplayName>Fetch personal details for user</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
-            <Item Key="ServiceUrl">{Settings:RestApiForValidateUserProfile}</Item>
+            <Item Key="ServiceUrl">{Settings:ApiUrlUserProfile}</Item>
             <Item Key="SendClaimsIn">Body</Item>
             <!-- Set AuthenticationType to Basic or ClientCertificate in production environments -->
             <Item Key="AuthenticationType">ClientCertificate</Item>
@@ -868,7 +870,7 @@
             <Item Key="AllowInsecureAuthInProduction">true</Item>
           </Metadata>
           <CryptographicKeys>
-            <Key Id="ClientCertificate" StorageReferenceId="{Settings:RestAPICertificateAppSecret}" />
+            <Key Id="ClientCertificate" StorageReferenceId="{Settings:ApiClientCertificateStorageReferenceId}" />
           </CryptographicKeys>
           <InputClaims>
             <!-- Claims sent to your REST API -->
@@ -897,13 +899,13 @@
           <DisplayName>Use SendGrid's email API to send the code the the user</DisplayName>
           <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.RestfulProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
           <Metadata>
-            <Item Key="ServiceUrl">https://api.sendgrid.com/v3/mail/send</Item>
+            <Item Key="ServiceUrl">{Settings:SendGridApiUrl}</Item>
             <Item Key="AuthenticationType">Bearer</Item>
             <Item Key="SendClaimsIn">Body</Item>
             <Item Key="ClaimUsedForRequestPayload">sendGridReqBody</Item>
           </Metadata>
           <CryptographicKeys>
-            <Key Id="BearerAuthenticationToken" StorageReferenceId="B2C_1A_SendGridSecret" />
+            <Key Id="BearerAuthenticationToken" StorageReferenceId="{Settings:SendGridAuthenticationTokenStorageReferenceId}" />
           </CryptographicKeys>
           <InputClaimsTransformations>
             <InputClaimsTransformation ReferenceId="GenerateSendGridRequestBody" />
@@ -914,6 +916,7 @@
         </TechnicalProfile>
       </TechnicalProfiles>
     </ClaimsProvider>
+
     <ClaimsProvider>
       <DisplayName>One time password technical profiles</DisplayName>
       <TechnicalProfiles>
@@ -1002,8 +1005,8 @@
                 Use the MS Docs for guidance: https://docs.microsoft.com/en-us/azure/active-directory-b2c/active-directory-b2c-create-custom-attributes-profile-edit-custom -->
 
           <Metadata>
-            <Item Key="ApplicationObjectId">{Settings:ExtensionClientId}</Item>
-            <Item Key="ClientId">{Settings:ApplicationObjectId}</Item>
+            <Item Key="ApplicationObjectId">{Settings:ExtensionsClientId}</Item>
+            <Item Key="ClientId">{Settings:ExtensionsObjectId}</Item>
           </Metadata>
 
           <CryptographicKeys>

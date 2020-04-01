@@ -5,13 +5,13 @@
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" 
   PolicySchemaVersion="0.3.0.0" 
   TenantId="{Settings:Tenant}"
-  PolicyId="{Settings:BasePolicy}TrustFrameworkExtensions_Terms" 
+  PolicyId="{Settings:PolicyPrefix}TrustFrameworkExtensions_Terms" 
   DeploymentMode="Development"
-  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}TrustFrameworkExtensions_Terms">
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:PolicyPrefix}TrustFrameworkExtensions_Terms">
   
   <BasePolicy>
     <TenantId>{Settings:Tenant}</TenantId>
-    <PolicyId>{Settings:BasePolicy}TrustFrameworkExtensions</PolicyId>
+    <PolicyId>{Settings:PolicyPrefix}TrustFrameworkExtensions</PolicyId>
   </BasePolicy>
 
   <BuildingBlocks>

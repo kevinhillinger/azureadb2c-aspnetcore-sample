@@ -5,12 +5,12 @@
   xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
   PolicySchemaVersion="0.3.0.0"
   TenantId="{Settings:Tenant}"
-  PolicyId="{Settings:BasePolicy}signup_signin"
-  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}signup_signin">
+  PolicyId="{Settings:PolicyPrefix}signup_signin"
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:PolicyPrefix}signup_signin">
 
   <BasePolicy>
     <TenantId>{Settings:Tenant}</TenantId>
-    <PolicyId>{Settings:BasePolicy}TrustFrameworkExtensions_Terms</PolicyId>
+    <PolicyId>{Settings:PolicyPrefix}TrustFrameworkExtensions_Terms</PolicyId>
   </BasePolicy>
 
   <BuildingBlocks>
