@@ -41,9 +41,7 @@ export class AuthService implements OnDestroy {
         return;
       }
       console.log("Redirect success: ", redirectResponse);
-      this.msalService.acquireTokenSilent({
-        scopes: scopes
-      })
+
     });
 
   }

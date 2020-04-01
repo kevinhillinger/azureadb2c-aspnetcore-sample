@@ -8,11 +8,6 @@
 <link href="https://customuifilesq2.blob.core.windows.net/customuicontainerfileq2/main.css" rel="stylesheet">
 </head>
 <body>
-    <script>
-        $.ajaxSetup({
-            cache: true
-        });
-    </script>
       <!-- right after body tag -->
       <dialog id="myDialog">
         <p>
@@ -30,8 +25,9 @@
             
         </div>
     </div>
-<script type="text/javascript" src="https://customuifilesq2.blob.core.windows.net/customuicontainerfileq2/index.js"></script></body>
+<script type="text/javascript" src="https://customuifilesq2.blob.core.windows.net/customuicontainerfileq2/index.js"></script>
 <script type="text/javascript">
+    
     var dialog = document.getElementById('myDialog');  
 
     document.getElementById('hide').onclick = function() {  
@@ -39,6 +35,7 @@
     };  
 
     function customizeSignInUI() {
+        //TODO:refactor common methods across pages
         //Hide the provide the following information label
         var introdivElements = document.getElementsByClassName("intro");
         if(typeof(introdivElements) != 'undefined' && introdivElements != null){
@@ -68,8 +65,7 @@
                 labelForPasswordControl.style.display = "none";
             } 
         }
-
-        //move the forgotpassword to the right place
+ 
         var forgotPassWordElem =  document.getElementById("forgotPassword");
         var buttonElements =  document.getElementsByClassName("buttons");
         if(typeof(buttonElements) != 'undefined' 
@@ -78,7 +74,7 @@
             var buttonElemParent = buttonElements[0].parentNode;
             buttonElemParent.appendChild(forgotPassWordElem);
             addBreaksToDivElements(buttonElemParent);
-        }
+        } 
 
         //add spacings as required
         var divEntryItems = document.getElementsByClassName("entry-item");
@@ -113,74 +109,122 @@
            }
         }
         dialog.close();
-        moveElementsOfGivenClassAsElement("claims-provider-list-buttons");   
-        moveElementsOfGivenClassAsElement("create");   
+        hideElementsOfGivenClass("claims-provider-list-buttons");   
         addAnchorElement();
+
+        setupPwdTogglers();
 
        
     }
 
     function addAnchorElement(){
-        var divApiElem = document.getElementById("api");
-        var anchorDivElement = createAnchorElement();
-        divApiElem.appendChild(anchorDivElement);
-    }
+    var divApiElem = document.getElementById("api");
+    var anchorDivElement = createAnchorElement();
+    divApiElem.appendChild(anchorDivElement);
+}
 
-    function createAnchorElement(){
-        var divElem = document.createElement('div');  
+function createAnchorElement(){
+    var divElem = document.createElement('div');  
 
-        divElem.setAttribute("align", "center");
-         // Create anchor element. 
-         var a = document.createElement('a');  
-                  
-        // Create the text node for anchor element. 
-        var link = document.createTextNode("Terms And Conditions"); 
-        
-        // Append the text node to anchor element. 
-        a.appendChild(link);  
-        
-        // Set the title. 
-        a.title = "Terms And Conditions";  
-        
-        // Set the href property. 
-        a.href = "#";  
-        a.onclick = function() {
-            var dialog = document.getElementById('myDialog'); 
-            dialog.showModal();
-        };
-       
-        divElem.appendChild(a);
-       return divElem;
-    }
+    divElem.setAttribute("align", "center");
+     // Create anchor element. 
+     var a = document.createElement('a');  
+              
+    // Create the text node for anchor element. 
+    var link = document.createTextNode("Terms And Conditions"); 
+    
+    // Append the text node to anchor element. 
+    a.appendChild(link);  
+    
+    // Set the title. 
+    a.title = "Terms And Conditions";  
+    
+    // Set the href property. 
+    a.href = "#";  
+    a.onclick = function() {
+        var dialog = document.getElementById('myDialog'); 
+        dialog.showModal();
+    };
+   
+    divElem.appendChild(a);
+   return divElem;
+}
 
-    function moveElementsOfGivenClassAsElement(className){
-        var elemsOfClass = document.getElementsByClassName(className);
-        if(typeof(elemsOfClass) != 'undefined' 
-            && elemsOfClass != null
-            && elemsOfClass.length > 0){
-            var elemToMove = elemsOfClass[0];
-            //this will move the element to the end of the parent element
-            elemToMove.parentNode.appendChild(elemToMove);
-        }
+function hideElementsOfGivenClass(className){
+    var elemsOfClass = document.getElementsByClassName(className);
+    if(typeof(elemsOfClass) != 'undefined' 
+        && elemsOfClass != null
+        && elemsOfClass.length > 0){
+        var elemToHide = elemsOfClass[0];
+        elemToHide.style.display = "none"; 
     }
-    function findLableForControl(el) {
-        var idVal = el.id;
-        labels = document.getElementsByTagName('label');
-        for( var i = 0; i < labels.length; i++ ) {
-            if (labels[i].htmlFor == idVal)
-                return labels[i];
-        }
-    }
+}
 
-    function addBreaksToDivElements(divElem){
-        for (var i=0; i<2; i++) {
-        linebreak = document.createElement("br");
-        divElem.appendChild(linebreak);
-        }
+function moveElementsOfGivenClassAsElement(className){
+    var elemsOfClass = document.getElementsByClassName(className);
+    if(typeof(elemsOfClass) != 'undefined' 
+        && elemsOfClass != null
+        && elemsOfClass.length > 0){
+        var elemToMove = elemsOfClass[0];
+        elemToMove.parentNode.appendChild(elemToMove);
     }
+}
+function findLableForControl(el) {
+    var idVal = el.id;
+    labels = document.getElementsByTagName('label');
+    for( var i = 0; i < labels.length; i++ ) {
+        if (labels[i].htmlFor == idVal)
+            return labels[i];
+    }
+}
+
+function addBreaksToDivElements(divElem){
+    for (var i=0; i<2; i++) {
+    linebreak = document.createElement("br");
+    divElem.appendChild(linebreak);
+    }
+}
+
+function makePwdToggler(pwd){
+  // Create show-password checkbox
+  var checkbox = document.createElement('input');
+  checkbox.setAttribute('type', 'checkbox');
+  var id = pwd.id + 'toggler';
+  checkbox.setAttribute('id', id);
+
+  var label = document.createElement('label');
+  label.setAttribute('for', id);
+  label.appendChild(document.createTextNode('show password'));
+
+  var div = document.createElement('div');
+  div.appendChild(checkbox);
+  div.appendChild(label);
+
+  // Add show-password checkbox under password input
+  pwd.insertAdjacentElement('afterend', div);
+
+  // Add toggle password callback
+  function toggle(){
+    if(pwd.type === 'password'){
+      pwd.type = 'text';
+    } else {
+      pwd.type = 'password';
+    }
+  }
+  checkbox.onclick = toggle;
+  // For non-mouse usage
+  checkbox.onkeydown = toggle;
+}
+
+function setupPwdTogglers(){
+  var pwdInputs = document.querySelectorAll('input[type=password]');
+  for (var i = 0; i < pwdInputs.length; i++) {
+    makePwdToggler(pwdInputs[i]);
+  }
+}
 
     
     window.onload = customizeSignInUI();
 </script>
-
+</body>
 </html>
