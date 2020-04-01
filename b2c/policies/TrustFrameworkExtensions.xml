@@ -1,0 +1,405 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TrustFrameworkPolicy 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" 
+  PolicySchemaVersion="0.3.0.0" 
+  TenantId="{Settings:Tenant}"
+  PolicyId="{Settings:BasePolicy}TrustFrameworkExtensions"
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}TrustFrameworkExtensions">
+  
+  <BasePolicy>
+    <TenantId>{Settings:Tenant}</TenantId>
+    <PolicyId>{Settings:BasePolicy}TrustFrameworkBase</PolicyId>
+  </BasePolicy>
+  <BuildingBlocks>
+    <ClaimsSchema>
+      <!--Sample action required: Update "Value" with your Company's Policy Version. In this Sample, we have used "v16". Change this to whatever version. -->
+       <ClaimType Id="currentDateTime">
+        <DisplayName>Current date and time</DisplayName>
+        <DataType>dateTime</DataType>
+        <UserHelpText>Current date and time</UserHelpText>
+      </ClaimType>
+
+
+      <!--Sample: The last time user reset the password-->
+      <ClaimType Id="extension_passwordResetOn">
+        <DisplayName>Password reset on</DisplayName>
+        <DataType>dateTime</DataType>
+        <UserHelpText>The last time user reset the password</UserHelpText>
+      </ClaimType>
+
+      <!--Sample: Indicates whether password reset is required, based on date comparison -->
+      <ClaimType Id="isPasswordResetOnGreaterThanNow">
+        <DisplayName>Indicates whether password reset is required</DisplayName>
+        <DataType>boolean</DataType>
+      </ClaimType>
+
+      <!--Sample: Indicates whether password reset exists -->
+      <ClaimType Id="isPasswordResetOnPresent">
+        <DisplayName>Is password reset on presented</DisplayName>
+        <DataType>boolean</DataType>
+      </ClaimType>
+
+      <!--Sample: Indicates whether password reset is required or not, based on date comparison and if extension_passwordResetOn is null -->
+      <ClaimType Id="skipPasswordReset">
+        <DisplayName>Skip password reset</DisplayName>
+        <DataType>boolean</DataType>
+      </ClaimType>   
+
+      <!--Password history requirement claim-->
+      <ClaimType Id="samePassword">
+				<DisplayName>samePassword</DisplayName>
+				<DataType>boolean</DataType>
+				<UserHelpText/>
+			</ClaimType>
+    </ClaimsSchema>
+    <ClaimsTransformations>
+      <!--Sample: Set the current UTC date and time to extension_passwordResetOn claim type-->
+      <ClaimsTransformation Id="SetPasswordResetOn" TransformationMethod="GetCurrentDateTime">
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="extension_passwordResetOn" TransformationClaimType="currentDateTime" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <!--Sample: Set the current UTC date and time to currentDateTime claim type-->
+      <ClaimsTransformation Id="SetCurrentDateTime" TransformationMethod="GetCurrentDateTime">
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="currentDateTime" TransformationClaimType="currentDateTime" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <!--Sample: Compare the dates and check if password reset is required -->
+      <ClaimsTransformation Id="ComparePasswordResetOnWithCurrentDateTime" TransformationMethod="DateTimeComparison">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="currentDateTime" TransformationClaimType="firstDateTime" />
+          <InputClaim ClaimTypeReferenceId="extension_passwordResetOn" TransformationClaimType="secondDateTime" />
+        </InputClaims>
+        <InputParameters>
+          <!--Sample: We check if the first date (current) minus 90 day is later than second date (password reset on).
+          If yes, it means that at least 90 days passed from the time user reset the password.
+          Note: the first date must contain a value. So, we use the current datetime. Don't change the order --> 
+          <InputParameter Id="operator" DataType="string" Value="earlier than" />
+          <!--Deom Action Required: Change the time span according to 60 or 90 days (in seconds)-->
+          <!-- TODO revert back -80 (for testing) to this 
+            <InputParameter Id="timeSpanInSeconds" DataType="int" Value="-7776000" />
+          -->
+            <InputParameter Id="timeSpanInSeconds" DataType="int" Value="{Settings:ForcePasswordResetAfterXSeconds}" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="isPasswordResetOnGreaterThanNow" TransformationClaimType="result" />
+        </OutputClaims>      
+      </ClaimsTransformation>  
+
+      <!--Sample: Check if extension_passwordResetOn is existed in user account. -->
+      <ClaimsTransformation Id="CheckIfPasswordResetOnPresent" TransformationMethod="DoesClaimExist">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="extension_passwordResetOn" TransformationClaimType="inputClaim" />
+        </InputClaims>					
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="isPasswordResetOnPresent" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <!--Sample: Check if datetime comparison is true and also the PasswordResetOn is presented in the user account.
+      If both of them are true, user doesn't need to reset the password--> 
+      <ClaimsTransformation Id="CheckWhetherPasswordResetCanBeSkipped" TransformationMethod="AndClaims">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="isPasswordResetOnGreaterThanNow" TransformationClaimType="inputClaim1" />
+          <InputClaim ClaimTypeReferenceId="isPasswordResetOnPresent" TransformationClaimType="inputClaim2" />
+        </InputClaims>					
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="skipPasswordReset" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+      <ClaimsTransformation Id="CheckPasswordEquivalence" TransformationMethod="CompareClaims">
+				<InputClaims>
+					<InputClaim ClaimTypeReferenceId="oldPassword" TransformationClaimType="inputClaim1" />
+					<InputClaim ClaimTypeReferenceId="newPassword" TransformationClaimType="inputClaim2" />
+				</InputClaims>
+				<InputParameters>
+					<InputParameter Id="operator" DataType="string" Value="EQUAL" />
+					<InputParameter Id="ignoreCase" DataType="string" Value="true" />
+				</InputParameters>
+				<OutputClaims>
+					<OutputClaim ClaimTypeReferenceId="SamePassword" TransformationClaimType="outputClaim" />
+				</OutputClaims>
+			</ClaimsTransformation>
+			<!-- This will ensure the value of samePassword is FALSE (not the same), else throw an error -->
+			<ClaimsTransformation Id="AssertSamePasswordIsFalse" TransformationMethod="AssertBooleanClaimIsEqualToValue">
+				<InputClaims>
+					<InputClaim ClaimTypeReferenceId="SamePassword" TransformationClaimType="inputClaim" />
+				</InputClaims>
+				<InputParameters>
+					<InputParameter Id="valueToCompareTo" DataType="boolean" Value="false" />
+				</InputParameters>
+			</ClaimsTransformation>
+       <ClaimsTransformation Id="CreateRandomUPNUserName" TransformationMethod="CreateRandomString">
+        <InputParameters>
+          <InputParameter Id="randomGeneratorType" DataType="string" Value="GUID" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="upnUserName" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="CreateUserPrincipalName" TransformationMethod="FormatStringClaim">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="upnUserName" TransformationClaimType="inputClaim" />
+        </InputClaims>
+        <InputParameters>
+          <InputParameter Id="stringFormat" DataType="string" Value="cpim_{0}@{RelyingPartyTenantId}" />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="userPrincipalName" TransformationClaimType="outputClaim" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+      <ClaimsTransformation Id="CreateAlternativeSecurityId" TransformationMethod="CreateAlternativeSecurityId">
+        <InputClaims>
+          <InputClaim ClaimTypeReferenceId="issuerUserId" TransformationClaimType="key" />
+          <InputClaim ClaimTypeReferenceId="identityProvider" TransformationClaimType="identityProvider" />
+        </InputClaims>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="alternativeSecurityId" TransformationClaimType="alternativeSecurityId" />
+        </OutputClaims>
+      </ClaimsTransformation>
+
+    <ClaimsTransformation Id="CreateSubjectClaimFromAlternativeSecurityId" TransformationMethod="CreateStringClaim">
+        <InputParameters>
+          <InputParameter Id="value" DataType="string" Value="Not supported currently. Use oid claim." />
+        </InputParameters>
+        <OutputClaims>
+          <OutputClaim ClaimTypeReferenceId="sub" TransformationClaimType="createdClaim" />
+        </OutputClaims>
+    </ClaimsTransformation>
+    </ClaimsTransformations>
+
+    <ContentDefinitions>
+          <!-- Override contentdefinition to enable javascript and custom ui-->
+          <ContentDefinition Id="api.localaccountsignup">
+            <LoadUri>{Settings:CustomUIUrlForSignUp}</LoadUri>
+            <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.0.0</DataUri>
+          </ContentDefinition>
+          <ContentDefinition Id="api.localaccountpasswordreset">
+            <LoadUri>{Settings:CustomUIUrlForPasswordReset}</LoadUri>
+            <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.0.0</DataUri>
+          </ContentDefinition>
+          <ContentDefinition Id="api.signuporsignin">
+            <LoadUri>{Settings:CustomUIUrl}</LoadUri>
+            <DataUri>urn:com:microsoft:aad:b2c:elements:contract:unifiedssp:2.0.0</DataUri>
+          </ContentDefinition>
+          <ContentDefinition Id="api.selfasserted">
+            <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.0.0</DataUri>
+          </ContentDefinition>
+        </ContentDefinitions>
+  </BuildingBlocks>
+  <ClaimsProviders>
+    <ClaimsProvider>
+      <DisplayName>Local Account SignIn</DisplayName>
+      <TechnicalProfiles>
+         <TechnicalProfile Id="login-NonInteractive">
+          <Metadata>
+            <!--Demo action required: Change to your ProxyIdentityExperienceFramework App Id-->
+            <Item Key="client_id">{Settings:ProxyIdentityExperienceFrameworkAppId}</Item>
+
+            <!--Demo action required: Change to your IdentityExperienceFramework App Id-->
+            <Item Key="IdTokenAudience">{Settings:IdentityExperienceFrameworkAppId}</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="client_id" DefaultValue="{Settings:ProxyIdentityExperienceFrameworkAppId}" />
+            <InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="{Settings:IdentityExperienceFrameworkAppId}" />
+          </InputClaims>
+        </TechnicalProfile>
+
+         <TechnicalProfile Id="AAD-UserReadUsingObjectId">
+          <OutputClaims>
+            <!--Sample: Read the 'password reset on' extension attribute -->
+            <OutputClaim ClaimTypeReferenceId="extension_passwordResetOn" />
+          </OutputClaims>
+            <OutputClaimsTransformations>
+            <OutputClaimsTransformation ReferenceId="SetCurrentDateTime" />
+            <OutputClaimsTransformation ReferenceId="ComparePasswordResetOnWithCurrentDateTime" />
+            <OutputClaimsTransformation ReferenceId="CheckIfPasswordResetOnPresent" />
+            <OutputClaimsTransformation ReferenceId="CheckWhetherPasswordResetCanBeSkipped" />
+          </OutputClaimsTransformations>            
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="AAD-UserWriteUsingLogonEmail">
+          <InputClaimsTransformations>
+            <!--Sample: Get current date and time -->
+            <InputClaimsTransformation ReferenceId="SetPasswordResetOn" />
+          </InputClaimsTransformations>
+          <PersistedClaims>
+            <!--Sample: On sign-up, set the 'password reset on' extension attribute with the current date and time -->
+            <PersistedClaim ClaimTypeReferenceId="extension_passwordResetOn" />
+            <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration, DisableStrongPassword"/>
+          </PersistedClaims>
+        </TechnicalProfile>
+
+        <TechnicalProfile Id="AAD-UserWritePasswordUsingObjectId">
+          <InputClaimsTransformations>
+           <!--Sample: Get current date and time -->
+           <InputClaimsTransformation ReferenceId="SetPasswordResetOn" />
+          </InputClaimsTransformations>
+          <PersistedClaims>
+            <!--Sample: On sign-up, set the 'password reset on' extension attribute with the current date and time -->
+            <PersistedClaim ClaimTypeReferenceId="extension_passwordResetOn" />
+            <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration, DisableStrongPassword"/>
+          </PersistedClaims>
+        </TechnicalProfile>
+
+          <!--Logic to check new password is not the same as old password
+						Validates old password before writing new password-->
+				<TechnicalProfile Id="LocalAccountWritePasswordUsingObjectId">
+					<DisplayName>Reset password</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<Metadata>
+						<Item Key="ContentDefinitionReferenceId">api.localaccountpasswordreset</Item>
+						<Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">You must not use your old password and password cannot contain email.</Item>
+             <!--Sample action required: Customize your own error message if user attempts to bypass TOS-->
+            <Item Key="UserMessageIfClaimsTransformationStringsAreNotEqual">Terms and conditions must be accepted in order to signin.</Item>
+        	</Metadata>
+					<CryptographicKeys>
+						<Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
+					</CryptographicKeys>
+					<InputClaims>
+						<InputClaim ClaimTypeReferenceId="objectId" />
+               <!--Please note this will have to change when the policy version changes-->
+            <InputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" DefaultValue="{Settings:PolicyTermsAndConditionsVersion}" />
+					</InputClaims>
+          <DisplayClaims>
+          	<DisplayClaim ClaimTypeReferenceId="oldPassword" Required="true" />
+						<DisplayClaim ClaimTypeReferenceId="newPassword" Required="true" />
+						<DisplayClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
+            <DisplayClaim ClaimTypeReferenceId="AgreedToTermsAndConditions"  />
+          </DisplayClaims>
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="oldPassword" Required="true" />
+						<OutputClaim ClaimTypeReferenceId="newPassword" Required="true" />
+						<OutputClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
+            <OutputClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" DefaultValue="true" Required="true" />
+            <OutputClaim ClaimTypeReferenceId="renewalTermsAndConditionsRequired" DefaultValue="true" />
+            <OutputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion"  />
+            <OutputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" DefaultValue=""/>
+					</OutputClaims>
+					<ValidationTechnicalProfiles>
+            <ValidationTechnicalProfile ReferenceId="ComparePasswords" />
+            <ValidationTechnicalProfile ReferenceId="VerifyTermsAndConditionsWereAccepted" /> 
+            <!--ValidationTechnicalProfile ReferenceId="VerifyNewPasswordDoesNotContainEmail" /--> 
+						<ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId">
+							<Preconditions>
+								<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+									<Value>SamePassword</Value>
+									<Value>true</Value>
+									<Action>SkipThisValidationTechnicalProfile</Action>
+								</Precondition>
+							</Preconditions>
+						</ValidationTechnicalProfile>
+					</ValidationTechnicalProfiles>
+				</TechnicalProfile>
+
+				<!-- Runs claimsTransformations to make sure new and old passwords differ -->
+				<TechnicalProfile Id="ComparePasswords">
+					<DisplayName>Compare Email And Verify Email</DisplayName>
+					<Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.ClaimsTransformationProtocolProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+					<OutputClaims>
+						<OutputClaim ClaimTypeReferenceId="SamePassword" />
+					</OutputClaims>
+					<OutputClaimsTransformations>
+						<OutputClaimsTransformation ReferenceId="CheckPasswordEquivalence" />
+						<OutputClaimsTransformation ReferenceId="AssertSamePasswordIsFalse" />
+					</OutputClaimsTransformations>
+				</TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+  <!--Provides federation with external tenant-->
+  <ClaimsProvider>
+  <Domain>{Settings:ExternalDomainName}</Domain>
+  <DisplayName>Login using External Tenant</DisplayName>
+  <TechnicalProfiles>
+    <TechnicalProfile Id="OIDC-ExternalTenant">
+      <DisplayName>{Settings:ExternalDomainName} Employee</DisplayName>
+      <Description>Login with your {Settings:ExternalDomainName} account</Description>
+      <Protocol Name="OpenIdConnect"/>
+      <Metadata>
+        <Item Key="METADATA">https://login.microsoftonline.com/{Settings:ExternalTenantName}/v2.0/.well-known/openid-configuration</Item>
+        <Item Key="client_id">{Settings:ExternalClientId}</Item>
+        <Item Key="response_types">code</Item>
+        <Item Key="scope">openid profile</Item>
+        <Item Key="response_mode">form_post</Item>
+        <Item Key="HttpBinding">POST</Item>
+        <Item Key="UsePolicyInRedirectUri">false</Item>
+      </Metadata>
+      <CryptographicKeys>
+        <Key Id="client_secret" StorageReferenceId="{Settings:ExternalTenantAppSecret}"/>
+      </CryptographicKeys>
+      <OutputClaims>
+        <OutputClaim ClaimTypeReferenceId="issuerUserId" PartnerClaimType="oid"/>
+        <OutputClaim ClaimTypeReferenceId="tenantId" PartnerClaimType="tid"/>
+        <OutputClaim ClaimTypeReferenceId="givenName" PartnerClaimType="given_name" />
+        <OutputClaim ClaimTypeReferenceId="surName" PartnerClaimType="family_name" />
+        <OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+        <OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="socialIdpAuthentication" AlwaysUseDefaultValue="true" />
+        <OutputClaim ClaimTypeReferenceId="identityProvider" PartnerClaimType="iss" />
+        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
+        <OutputClaim ClaimTypeReferenceId="email" PartnerClaimType="preferred_username" />
+
+      </OutputClaims>
+      <OutputClaimsTransformations>
+        <OutputClaimsTransformation ReferenceId="CreateRandomUPNUserName"/>
+        <OutputClaimsTransformation ReferenceId="CreateUserPrincipalName"/>
+        <OutputClaimsTransformation ReferenceId="CreateAlternativeSecurityId"/>
+        <OutputClaimsTransformation ReferenceId="CreateSubjectClaimFromAlternativeSecurityId"/>
+        <!--OutputClaimsTransformation ReferenceId="SplitDisplayName"/>
+        <OutputClaimsTransformation ReferenceId="GetFirstNameFromDisplayNameCollection"/>
+        <OutputClaimsTransformation ReferenceId="GetSurNameFromDisplayNameCollection"/-->
+
+      </OutputClaimsTransformations>
+      <UseTechnicalProfileForSessionManagement ReferenceId="SM-SocialLogin"/>
+    </TechnicalProfile>
+  </TechnicalProfiles>
+</ClaimsProvider>
+    
+</ClaimsProviders>
+  <UserJourneys>
+      <UserJourney Id="SignUpSignInExternalTenant">
+      <OrchestrationSteps>
+        <OrchestrationStep Order="1" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
+          <ClaimsProviderSelections>
+            <ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
+            <ClaimsProviderSelection TargetClaimsExchangeId="ExternalTenantExchange" />
+          </ClaimsProviderSelections>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>objectId</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
+            <ClaimsExchange Id="ExternalTenantExchange" TechnicalProfileReferenceId="OIDC-ExternalTenant" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+
+        <!-- This step reads any user attributes that we may not have received when in the token. -->
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <ClaimsExchanges>
+            <ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+ 
+        <OrchestrationStep Order="4" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+    
+      </OrchestrationSteps>
+      <ClientDefinition ReferenceId="DefaultWeb" />
+    </UserJourney>
+	</UserJourneys>
+
+</TrustFrameworkPolicy>

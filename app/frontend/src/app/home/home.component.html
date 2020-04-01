@@ -1,0 +1,17 @@
+<h1>{{ welcomeMessage }}</h1>
+<p>Welcome to the Angular app, secured with Azure AD B2C.</p>
+<ul>
+  <li><a href='https://github.com/AzureAD/microsoft-authentication-library-for-js'>MSAL.js</a> for authentication</li>
+  <li><a href='https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows'>Azure AD B2C</a> for the Identity Provider</li>
+  <li><a href='https://angular.io/'>Angular</a> and <a href='http://www.typescriptlang.org/'>TypeScript</a> for client-side code</li>
+  <li><a href='https://github.com/Azure-Samples/active-directory-b2c-dotnetcore-webapi'>asp.net core web api</a> secured by B2C for the backend API.</li>
+</ul>
+
+<div>
+  <input type="button" value="Sign in" class="btn btn-primary" (click)="signIn()" *ngIf="!isAuthenticated" style="margin-right:10px">
+  <input type="button" value="Forgot Password" class="btn btn-danger" (click)="resetPassword()" *ngIf="!isAuthenticated" style="margin-right:10px">
+
+  <input type="button" value="Reset Password" class="btn btn-warning" (click)="resetPassword()" *ngIf="isAuthenticated" style="margin-right:10px">
+  <input type="button" value="Sign out" class="btn btn-primary" (click)="signOut()" *ngIf="isAuthenticated">
+</div>
+

@@ -1,0 +1,20 @@
+<h1 id="tableLabel">User Profile</h1>
+
+<p>This component demonstrates fetching profile data from the server.</p>
+
+<p *ngIf="!profile"><em>Loading...</em></p>
+
+<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="profile">
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let claim of profile.claims">
+      <td>{{ claim.type }}</td>
+      <td>{{ claim.value }}</td>
+    </tr>
+  </tbody>
+</table>

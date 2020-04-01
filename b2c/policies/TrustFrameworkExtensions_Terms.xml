@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TrustFrameworkPolicy 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" 
+  PolicySchemaVersion="0.3.0.0" 
+  TenantId="{Settings:Tenant}"
+  PolicyId="{Settings:BasePolicy}TrustFrameworkExtensions_Terms" 
+  DeploymentMode="Development"
+  PublicPolicyUri="http://{Settings:Tenant}/{Settings:BasePolicy}TrustFrameworkExtensions_Terms">
+  
+  <BasePolicy>
+    <TenantId>{Settings:Tenant}</TenantId>
+    <PolicyId>{Settings:BasePolicy}TrustFrameworkExtensions</PolicyId>
+  </BasePolicy>
+
+  <BuildingBlocks>
+    <ClaimsTransformations>
+    </ClaimsTransformations>
+  </BuildingBlocks>
+
+  <ClaimsProviders>
+      <ClaimsProvider>
+        <DisplayName>Local Account SignIn</DisplayName>
+        <TechnicalProfiles>
+
+          <TechnicalProfile Id="SelfAsserted-LocalAccountSignin-Email">
+            <OutputClaims>
+              <OutputClaim ClaimTypeReferenceId="renewalTermsAndConditionsRequired" DefaultValue="false" />
+              <OutputClaim ClaimTypeReferenceId="roles" DefaultValue=""/>
+              <OutputClaim ClaimTypeReferenceId="givenName"  DefaultValue=""/>
+              <OutputClaim ClaimTypeReferenceId="surName"  DefaultValue=""/>
+            </OutputClaims>
+          <ValidationTechnicalProfiles>
+            <ValidationTechnicalProfile ReferenceId="REST-ValidateUserProfileWithSignInName" />
+           </ValidationTechnicalProfiles>
+          </TechnicalProfile>
+          <!--Sample: Provides a required Terms of Service Check-Box during sign-up-->
+          <TechnicalProfile Id="LocalAccountSignUpWithLogonEmail">
+            <Metadata>
+              <Item Key="UserMessageIfClaimsTransformationBooleanValueIsNotEqual">Password cannot contain email.</Item>
+            </Metadata>
+            <ValidationTechnicalProfiles>
+              <!--The first time (user sign up) we assume that extension_AgreedToTermsAndConditions is empty string-->
+              <ValidationTechnicalProfile ReferenceId="VerifyTermsAndConditionsWereAccepted" /> 
+              <!--ValidationTechnicalProfile ReferenceId="ClaimsTransformation-SetIsNewPasswordEmail" /-->
+              <!--ValidationTechnicalProfile ReferenceId="VerifyNewPasswordDoesNotContainEmail" /--> 
+              <!--ValidationTechnicalProfile ReferenceId="REST-ValidateEmail" /-->
+              <ValidationTechnicalProfile ReferenceId="REST-ValidateUserProfileWithEmail" />
+              <ValidationTechnicalProfile ReferenceId="AAD-UserWriteUsingLogonEmail">
+                <!--Preconditions>
+                  <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                    <Value>isNewPasswordEmail</Value>
+                    <Value>true</Value>
+                    <Action>SkipThisValidationTechnicalProfile</Action>
+                  </Precondition>
+                </Preconditions-->
+              </ValidationTechnicalProfile>
+            </ValidationTechnicalProfiles>
+          </TechnicalProfile>
+
+          <!--Sample: AAD-UserWriteUsingLogonEmail appends the base policy by writing the value stored in claim named "AgreedToTermsAndConditions"
+          to the AzureAD B2C directory ext attribute called "extension_AgreedToTermsAndConditions"-->
+          <TechnicalProfile Id="AAD-UserWriteUsingLogonEmail">
+            <PersistedClaims>
+              <PersistedClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" PartnerClaimType="extension_AgreedToTermsAndConditions" />
+            </PersistedClaims>
+          </TechnicalProfile>
+          <TechnicalProfile Id="AAD-ReadTermsAndConditions">
+            <Metadata>
+              <Item Key="Operation">Read</Item>
+              <Item Key="RaiseErrorIfClaimsPrincipalDoesNotExist">true</Item>
+            </Metadata>
+            <IncludeInSso>false</IncludeInSso>
+            <InputClaims>
+              <InputClaim ClaimTypeReferenceId="objectId" Required="true" />
+            </InputClaims>
+            <OutputClaims>
+              <OutputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" DefaultValue=""/>
+            </OutputClaims>
+          <IncludeTechnicalProfile ReferenceId="AAD-Common" />
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+
+    <ClaimsProvider>
+      <DisplayName>Self Asserted Terms And Use Refresh if Not Valid</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="SelfAsserted-RefreshTOS">
+          <DisplayName>Terms And Use Update</DisplayName>
+          <Protocol Name="Proprietary" Handler="Web.TPEngine.Providers.SelfAssertedAttributeProvider, Web.TPEngine, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+          <Metadata>
+            <Item Key="ContentDefinitionReferenceId">api.selfasserted</Item>
+            <!--Sample action required: Customize your own error message if user attempts to bypass TOS-->
+            <Item Key="UserMessageIfClaimsTransformationStringsAreNotEqual">Terms and conditions must be accepted in order to signin.</Item>
+          </Metadata>
+          <IncludeInSso>false</IncludeInSso>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" />
+          </OutputClaims>
+          <ValidationTechnicalProfiles>
+            <ValidationTechnicalProfile ReferenceId="VerifyTermsAndConditionsWereAccepted" />
+            <ValidationTechnicalProfile ReferenceId="AAD-UserWriteProfileUsingObjectIdUpdateTOU" />
+          </ValidationTechnicalProfiles>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
+  </ClaimsProviders>
+
+  <UserJourneys>
+    <UserJourney Id="TermsAndConditionsSignUpOrSignIn">
+      <OrchestrationSteps>
+        <OrchestrationStep Order="1" Type="CombinedSignInAndSignUp" ContentDefinitionReferenceId="api.signuporsignin">
+          <ClaimsProviderSelections>
+            <ClaimsProviderSelection ValidationClaimsExchangeId="LocalAccountSigninEmailExchange" />
+            <ClaimsProviderSelection TargetClaimsExchangeId="ExternalTenantExchange" />
+          </ClaimsProviderSelections>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="LocalAccountSigninEmailExchange" TechnicalProfileReferenceId="SelfAsserted-LocalAccountSignin-Email" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="2" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimsExist" ExecuteActionsIf="true">
+              <Value>objectId</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SignUpWithLogonEmailExchange" TechnicalProfileReferenceId="LocalAccountSignUpWithLogonEmail" />
+            <ClaimsExchange Id="ExternalTenantExchange" TechnicalProfileReferenceId="OIDC-ExternalTenant" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <!-- This step reads any user attributes that we may not have received when in hte token. -->
+        <OrchestrationStep Order="3" Type="ClaimsExchange">
+          <Preconditions>
+            <!-- Skip next 4 steps if autheentication source was the external tenant -->
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>authenticationSource</Value>
+              <Value>socialIdpAuthentication</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="AADUserReadWithObjectId" TechnicalProfileReferenceId="AAD-UserReadUsingObjectId" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <OrchestrationStep Order="4" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>authenticationSource</Value>
+              <Value>socialIdpAuthentication</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+              <Value>skipPasswordReset</Value>
+              <Value>True</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>            
+          </Preconditions>        
+          <ClaimsExchanges>
+            <ClaimsExchange Id="NewCredentials" TechnicalProfileReferenceId="LocalAccountWritePasswordUsingObjectId" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+       
+        <!--Sample: This steps reads the directory again to refresh the variable of the TOS stored on the user object. If you do not plan
+        on sending the TOS version in a claim to the application, you can remove this step.-->
+        <OrchestrationStep Order="5" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="true">
+                <Value>authenticationSource</Value>
+                <Value>socialIdpAuthentication</Value>
+                <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="AAD-ReadTermsAndConditions" TechnicalProfileReferenceId="AAD-ReadTermsAndConditions" />
+          </ClaimsExchanges>
+        </OrchestrationStep>
+        <!--OrchestrationStep Order="6" Type="ClaimsExchange">
+          <Preconditions>
+            <Precondition Type="ClaimEquals" ExecuteActionsIf="false">
+              <Value>authenticationSource</Value>
+              <Value>socialIdpAuthentication</Value>
+              <Action>SkipThisOrchestrationStep</Action>
+            </Precondition>
+          </Preconditions>
+          <ClaimsExchanges>
+            <ClaimsExchange Id="SplitDisplayName" TechnicalProfileReferenceId="SplitDisplayName" />
+          </ClaimsExchanges>
+        </OrchestrationStep-->
+        <OrchestrationStep Order="6" Type="SendClaims" CpimIssuerTechnicalProfileReferenceId="JwtIssuer" />
+      </OrchestrationSteps>
+      <ClientDefinition ReferenceId="DefaultWeb" />
+    </UserJourney>
+
+  </UserJourneys>
+
+  
+  <RelyingParty>
+    <DefaultUserJourney ReferenceId="TermsAndConditionsSignUpOrSignIn" />
+    <UserJourneyBehaviors>
+      <JourneyInsights TelemetryEngine="ApplicationInsights" InstrumentationKey="cf38082f-cf3a-4d4a-859b-417c093b6bb0" DeveloperMode="true" ClientEnabled="true" ServerEnabled="true" TelemetryVersion="1.0.0" />
+      <ScriptExecution>Allow</ScriptExecution>
+    </UserJourneyBehaviors>
+    <TechnicalProfile Id="PolicyProfile">
+      <DisplayName>PolicyProfile</DisplayName>
+      <Protocol Name="OpenIdConnect" />
+      <OutputClaims>
+        <!--Sample: Additional claims are not required and were used for testing purposes only -->        
+        <!--Sample action Required: Remove after testing--><OutputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" />
+        <!--Sample action Required: Remove after testing--><OutputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" />
+        <!--Sample action Required: Remove after testing--><OutputClaim ClaimTypeReferenceId="renewalTermsAndConditionsRequired" />
+          <!--Sample action required: Remove following claims in production environment-->
+        <OutputClaim ClaimTypeReferenceId="currentDateTime" /> 
+        <OutputClaim ClaimTypeReferenceId="extension_passwordResetOn" />
+        <OutputClaim ClaimTypeReferenceId="isPasswordResetOnGreaterThanNow" />
+        <OutputClaim ClaimTypeReferenceId="isPasswordResetOnPresent" />
+        <OutputClaim ClaimTypeReferenceId="skipPasswordReset" />
+        <OutputClaim ClaimTypeReferenceId="emailvalidated" DefaultValue="false"/>
+        <OutputClaim ClaimTypeReferenceId="emailcount" DefaultValue="0"/>
+        <OutputClaim ClaimTypeReferenceId="roles" DefaultValue=""/>
+        <!--The next two are optional claims and would need to be set up in the external tenant for the application if they dont show when federating-->
+        <OutputClaim ClaimTypeReferenceId="givenName"  DefaultValue=""/>
+        <OutputClaim ClaimTypeReferenceId="surName"  DefaultValue=""/>
+        <OutputClaim ClaimTypeReferenceId="displayName" />
+        <OutputClaim ClaimTypeReferenceId="email" />
+        <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="sub" />
+        <OutputClaim ClaimTypeReferenceId="tenantId" AlwaysUseDefaultValue="true" DefaultValue="{Policy:TenantObjectId}" />
+      </OutputClaims>
+      <SubjectNamingInfo ClaimType="sub" />
+    </TechnicalProfile>
+  </RelyingParty>
+
+</TrustFrameworkPolicy>
