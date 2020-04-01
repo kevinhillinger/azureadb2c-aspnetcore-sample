@@ -10,7 +10,7 @@ az group create -n $resource_group -l $location  --output none
 
 echo "Creating storage account."
 
-az storage account create -n $storage_account_name \c
+az storage account create -n $storage_account_name 
     -g $resource_group \
     -l $location \
     --sku Standard_LRS \
