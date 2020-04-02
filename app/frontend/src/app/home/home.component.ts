@@ -21,6 +21,10 @@ export class HomeComponent implements OnInit {
     this.authService.signIn();
   }
   
+  signInFederated() {
+    this.authService.signIn();
+  }
+  
   signOut() {
     this.authService.signOut();
   }

@@ -3,6 +3,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Subscription } from "rxjs";
 import { UserFlow } from "./userFlow.enum";
 import { AuthError, AuthResponse, AuthenticationParameters } from "msal";
+import { environment } from "../../environments/environment"
 
 interface MSALError {
   error: string;
@@ -55,6 +56,14 @@ export class AuthService implements OnDestroy {
   signIn() {
     let request: AuthenticationParameters = {
       scopes: this.scopes
+    };
+    this.msalService.loginRedirect(request);
+  }
+
+  signInFederated() {
+    let request: AuthenticationParameters = {
+      scopes: this.scopes,
+      extraQueryParameters: { "domain_hint": environment.federatedDomain }
     };
     this.msalService.loginRedirect(request);
   }
