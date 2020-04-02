@@ -1,14 +1,45 @@
 # Getting Started
 
+## Developer Setup
 
-# Custom Policy Setup
-To setup this sample with custom policies in B2C, perform these actions in this order
+1. Install Visual Studio Code
+2. Install the [Azure AD B2C custom policy extension](https://marketplace.visualstudio.com/items?itemName=AzureADB2CTools.aadb2c)
+3. Install the [Azure Tools extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.vscode-node-azure-pack)
+4. An Azure Subscription - to create the B2C tenant
+5. [Azure Cloud Shell](https://shell.azure.com) - to execute the scripts that do a lot for you :)
+
+### Cloud Shell
+
+When working with this repository, you will clone within the cloud shell.
+
+```bash
+mkdir workspace && cd workspace
+git clone https://github.com/kevinhillinger/azureadb2c-aspnetcore-sample.git
+cd azureadb2c-aspnetcore-sample
+```
+
+Once this is done, you will be able to execute scripts within the ```./scripts``` folder.
+
+
+## B2C Setup
+To build this sample with custom policies in B2C, the following things needs to be done:
+
+1. Create a B2C tenant and associate it to your subscription
+2. Create the keys and application registrations in B2C for the Identity Experience Framework (to use the custom policies)
+3. Create the application registration for extension attributes (custom attributes for users)
+4. Create an application registration in the B2C tenant for the Angular frontend
+5. Create an application registration in the B2C tenant for the Web API backend
+6. Update the ```b2c/policies/appsettings.json``` with the values from steps 1-5 
+7. Build the custom policies in Visual Studio Code.
+
+# Azure AD B2C Setup
 
 ## 1. Create a B2C tenant and associate it to your subscription
+Here are the [instructions](https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-tenant). Follow them for the B2C tenant.
 
-Here are the [instructions](https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-tenant).
 
-## 2. Create a registration for the Angular SPA
+
+## 2. Create a registration for the Angular frontend
 
 The frontend of the app needs to be represented in b2c, i.e. b2c needs to know about it as "[relying party(https://en.wikipedia.org/wiki/Relying_party)]" application, also known as a [service provider](https://en.wikipedia.org/wiki/Service_provider_(SAML)) in the SAML days of yore.
 
@@ -28,7 +59,7 @@ imports: [
     }),
 ```
 
-## 3. Create the keys and applications for the Identity Experience Framework
+## 3. Create the keys and application registrations for the Identity Experience Framework
 
 The encryption and signing keys plus the application registrations are needed to get custom policies working.
 

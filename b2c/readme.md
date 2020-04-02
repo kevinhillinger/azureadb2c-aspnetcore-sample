@@ -21,6 +21,18 @@ git clone https://github.com/Azure-Samples/active-directory-b2c-custom-policy-st
 
 [https://github.com/azure-ad-b2c/samples/tree/master/policies/force-password-reset-after-90-days](https://github.com/azure-ad-b2c/samples/tree/master/policies/force-password-reset-after-90-days)
 
+## Custom Email Verification (SendGrid)
+
+This sample sends email verifications using SendGrid. If you haven't already, you'll need to setup the following:
+
+1. Create a [SendGrid account](https://docs.microsoft.com/en-us/azure/sendgrid-dotnet-how-to-send-email#create-a-sendgrid-account)
+2. Create a [SendGrid API Key](https://docs.microsoft.com/en-us/azure/sendgrid-dotnet-how-to-send-email#to-find-your-sendgrid-api-key)
+3. Create the [email template](https://docs.microsoft.com/en-us/azure/active-directory-b2c/custom-email#create-sendgrid-template) in SendGrid
+4. Create a [Policy Key in B2C](https://docs.microsoft.com/en-us/azure/active-directory-b2c/custom-email#create-azure-ad-b2c-policy-key)
+
+
+[Here](https://docs.microsoft.com/en-us/azure/active-directory-b2c/custom-email) is the official documentation for setting it up for B2C.
+
 # Backend
 
 ## B2C Integration of Web API 

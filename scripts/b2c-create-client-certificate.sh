@@ -1,4 +1,10 @@
 #!/bin/bash
+
+# ----------------------------------------------------------------------------------
+# Creates the PFX file
+# when setting the password, save it to a location you can retreive later
+# ----------------------------------------------------------------------------------
+
 openssl genrsa 2048 > private_key.pem
 openssl req -x509 -new -key private_key.pem -out public.pem
 
