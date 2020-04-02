@@ -1005,8 +1005,8 @@
                 Use the MS Docs for guidance: https://docs.microsoft.com/en-us/azure/active-directory-b2c/active-directory-b2c-create-custom-attributes-profile-edit-custom -->
 
           <Metadata>
-            <Item Key="ApplicationObjectId">{Settings:ExtensionsClientId}</Item>
-            <Item Key="ClientId">{Settings:ExtensionsObjectId}</Item>
+            <Item Key="ApplicationObjectId">{Settings:ExtensionsObjectId}</Item>
+            <Item Key="ClientId">{Settings:ExtensionsClientId}</Item>
           </Metadata>
 
           <CryptographicKeys>

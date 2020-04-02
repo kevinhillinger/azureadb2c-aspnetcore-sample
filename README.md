@@ -34,6 +34,10 @@ To build this sample with custom policies in B2C, the following things needs to 
 
 # Azure AD B2C Setup
 
+## Federating with an Azure AD Tenant
+
+Documentation [here](https://docs.microsoft.com/en-us/azure/active-directory-b2c/identity-provider-azure-ad-single-tenant-custom?tabs=applications#register-an-application)
+
 ## 1. Create a B2C tenant and associate it to your subscription
 Here are the [instructions](https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-tenant). Follow them for the B2C tenant.
 
