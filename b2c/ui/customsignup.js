@@ -52,7 +52,7 @@ function customizeSignUpUI() {
 
 
     //add the terms condition anchor element in the right place.
-    var elemAgreeToTermsAndCondition = document.getElementById("AgreedToTermsAndConditions_v16");
+    var elemAgreeToTermsAndCondition = document.getElementById("AgreedToTermsAndConditions_v1");
     var parentToelemAgreeToTermsAndCondition = elemAgreeToTermsAndCondition.parentElement;
     parentToelemAgreeToTermsAndCondition.prepend(elemAgreeToTermsAndCondition);
     var anchorElement = createAnchorElement();

@@ -14,7 +14,7 @@
   </BasePolicy>
   <BuildingBlocks>
     <ClaimsSchema>
-      <!--Sample action required: Update "Value" with your Company's Policy Version. In this Sample, we have used "v16". Change this to whatever version. -->
+      <!--Sample action required: Update "Value" with your Company's Policy Version. In this Sample, it's set in the appsettings via PolicyTermsAndConditionsVersion. Change this to whatever version. -->
        <ClaimType Id="currentDateTime">
         <DisplayName>Current date and time</DisplayName>
         <DataType>dateTime</DataType>

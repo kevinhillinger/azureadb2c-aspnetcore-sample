@@ -4,7 +4,12 @@
 
 export const environment = {
   production: false,
-  federatedDomain: "hillingk.onmicrosoft.com"
+  auth: {
+    federatedDomain: "hillingk.onmicrosoft.com",
+    redirectUri: "https://localhost:4201/",
+    postLogoutRedirectUri: "https://localhost:4201/",
+    authority: "https://idhack007.b2clogin.com/tfp/idhack007.onmicrosoft.com/B2C_1A_signup_signin/" //default authority is signin signup user flow
+  }
 };
 
 /*

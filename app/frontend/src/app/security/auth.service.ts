@@ -55,7 +55,8 @@ export class AuthService implements OnDestroy {
 
   signIn() {
     let request: AuthenticationParameters = {
-      scopes: this.scopes
+      scopes: this.scopes,
+      extraQueryParameters: {}
     };
     this.msalService.loginRedirect(request);
   }
@@ -63,7 +64,7 @@ export class AuthService implements OnDestroy {
   signInFederated() {
     let request: AuthenticationParameters = {
       scopes: this.scopes,
-      extraQueryParameters: { "domain_hint": environment.federatedDomain }
+      extraQueryParameters: { "domain_hint": environment.auth.federatedDomain }
     };
     this.msalService.loginRedirect(request);
   }

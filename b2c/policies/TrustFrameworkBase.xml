@@ -437,7 +437,7 @@
         <DataType>string</DataType>
         <UserInputType>CheckboxMultiSelect</UserInputType>
         <Restriction>
-          <Enumeration Text="" Value="v16" />
+          <Enumeration Text="" Value="{Settings:PolicyTermsAndConditionsVersion}" />
         </Restriction>
       </ClaimType>
 
@@ -1293,7 +1293,7 @@
             <OutputClaim ClaimTypeReferenceId="newUser" />
             <OutputClaim ClaimTypeReferenceId="AgreedToTermsAndConditions" DefaultValue="true" Required="true" />
             <OutputClaim ClaimTypeReferenceId="renewalTermsAndConditionsRequired" DefaultValue="true" />
-            <OutputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" DefaultValue="v16" />
+            <OutputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion" DefaultValue="{Settings:PolicyTermsAndConditionsVersion}" />
             <OutputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" DefaultValue=""/>
             <OutputClaim ClaimTypeReferenceId="emailvalidated" DefaultValue="false"/>
             <OutputClaim ClaimTypeReferenceId="emailcount" />
