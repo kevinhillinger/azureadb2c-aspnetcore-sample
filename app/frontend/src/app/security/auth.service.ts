@@ -31,12 +31,7 @@ export class AuthService implements OnDestroy {
   }
 
   getIsAuthenticated() {
-    console.log(this.msalService.getAccount());
-    this.msalService.acquireTokenSilent({
-      scopes: this.scopes,
-      redirectUri: this.msalService.getRedirectUri()
-    });
-    return this.isAuthenticated;
+    return this.msalService.getAccount() != undefined;
   }
 
   register() {
