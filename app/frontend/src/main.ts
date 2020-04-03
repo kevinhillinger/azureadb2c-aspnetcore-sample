@@ -5,7 +5,7 @@ import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 
 const providers = [
-  { provide: 'BASE_URL',  useValue: 'https://localhost:5001/', deps: [] }
+  { provide: 'BASE_URL',  useValue: environment.apiBaseUrl, deps: [] }
 ];
 
 if (environment.production) {

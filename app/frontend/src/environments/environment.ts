@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  apiBaseUrl: 'https://localhost:5001/',
   auth: {
     federatedDomain: "hillingk.onmicrosoft.com",
     redirectUri: "https://localhost:4201/",
