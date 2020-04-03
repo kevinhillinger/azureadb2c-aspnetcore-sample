@@ -464,6 +464,7 @@
       </ClaimType>
     </ClaimsSchema>
     <Predicates>
+
       <Predicate Id="LengthRange" Method="IsLengthRange">
         <UserHelpText>The password must be between 8 and 256 characters.</UserHelpText>
         <Parameters>
@@ -471,29 +472,34 @@
           <Parameter Id="Maximum">256</Parameter>
         </Parameters>
       </Predicate>
+
       <Predicate Id="Lowercase" Method="IncludesCharacters">
         <UserHelpText>a lowercase letter</UserHelpText>
         <Parameters>
           <Parameter Id="CharacterSet">a-z</Parameter>
         </Parameters>
       </Predicate>
+
       <Predicate Id="Uppercase" Method="IncludesCharacters">
-        <UserHelpText>an uppercase letter</UserHelpText>
+        <UserHelpText>at least one uppercase letter is required.</UserHelpText>
         <Parameters>
           <Parameter Id="CharacterSet">A-Z</Parameter>
         </Parameters>
       </Predicate>
+
       <Predicate Id="Symbol" Method="IncludesCharacters">
         <UserHelpText>a symbol</UserHelpText>
         <Parameters>
           <Parameter Id="CharacterSet">@#$%^&amp;*\-_+=[]{}|\\:',.?/`~"();!</Parameter>
         </Parameters>
       </Predicate>
+
       <Predicate Id="PasswordIsNotEmail" Method="MatchesRegex" HelpText="Password cannot be email.">
         <Parameters>
           <Parameter Id="RegularExpression">^((?!.*([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)).*)$</Parameter>
         </Parameters>
       </Predicate>
+
     </Predicates>
     <PredicateValidations>
     <PredicateValidation Id="CustomPassword">

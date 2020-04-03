@@ -6,11 +6,13 @@ export const environment = {
   production: false,
   apiBaseUrl: 'https://localhost:5001/',
   auth: {
+    clientId: '1f16026e-109a-4f94-8985-83fd0fcd10a6',
     federatedDomain: "hillingk.onmicrosoft.com",
     redirectUri: "https://localhost:4201/",
     postLogoutRedirectUri: "https://localhost:4201/",
     authority: "https://idhack007.b2clogin.com/tfp/idhack007.onmicrosoft.com/B2C_1A_signup_signin/" //default authority is signin signup user flow
-  }
+  },
+  consentScopes: ["https://idhack007.onmicrosoft.com/webapp-sample-api/weatherforecast.read"]
 };
 
 /*

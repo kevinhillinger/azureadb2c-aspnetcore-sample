@@ -26,7 +26,7 @@ import { environment } from 'src/environments/environment';
   imports: [
     MsalModule.forRoot({ 
       auth: {
-        clientId: '1f16026e-109a-4f94-8985-83fd0fcd10a6',
+        clientId: environment.auth.clientId,
         navigateToLoginRequestUrl : false,
         redirectUri: environment.auth.redirectUri,
         postLogoutRedirectUri: environment.auth.postLogoutRedirectUri,
@@ -40,7 +40,7 @@ import { environment } from 'src/environments/environment';
     },
     {
       popUp: false, 
-      consentScopes: ["https://idhack007.onmicrosoft.com/webapp-sample-api/weatherforecast.read"]
+      consentScopes: environment.consentScopes
     }),
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,

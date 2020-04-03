@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
   }
   
   signInFederated() {
-    this.authService.signIn();
+    this.authService.signInFederated();
   }
   
   signOut() {
