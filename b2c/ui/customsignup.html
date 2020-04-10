@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -165,11 +165,17 @@ function makePwdToggler(pwd){
     }
   }
   checkbox.onclick = toggle;
-  // For non-mouse usage
-  checkbox.onkeydown = toggle;
+ // For non-mouse usage
+ checkbox.addEventListener("keyup", handleCheckboxEvent, true);
 }
 
+    
+function handleCheckboxEvent(e) {
 
+    if (e.keyCode === 32) {  // If spacebar fired the event
+        toggle();
+    }
+}   
 
 function createAnchorElement(){
      // Create anchor element. 
