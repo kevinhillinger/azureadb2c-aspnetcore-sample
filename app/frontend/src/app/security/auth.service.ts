@@ -21,11 +21,11 @@ enum MsalTopic {
 @Injectable()
 export class AuthService implements OnDestroy {
   private isAuthenticated: boolean;
-  private readonly authorityBaseUrl = "https://idhack007.b2clogin.com/tfp/idhack007.onmicrosoft.com/";
+  private readonly authorityBaseUrl = environment.auth.authorityBaseUrl;
   private readonly forgotPasswordCode = "AADB2C90118:";
 
   private readonly subscriptions = new Map();
-  private readonly scopes = ["https://idhack007.onmicrosoft.com/webapp-sample-api/weatherforecast.read"];
+  private readonly scopes = environment.auth.consentScopes;
 
   constructor(private msalService: MsalService, private broadcastService: BroadcastService) {
   }
@@ -91,7 +91,7 @@ export class AuthService implements OnDestroy {
     
     // check if we're getting a redirect back from B2C to handle the password reset. If we are, handle it.
     if (this.isForgotPasswordFlow(payload)) {
-      this.handleForgotPassword();
+      //this.handleForgotPassword();
     }
   }
 
@@ -105,8 +105,9 @@ export class AuthService implements OnDestroy {
    * Handles the redirect back to B2C for resetting the password
    */
   private handleForgotPassword() {
-    this.msalService.authority = this.authorityBaseUrl + UserFlow.PasswordReset;
-    this.msalService.loginRedirect();
+    this.msalService.loginRedirect({
+      authority: this.authorityBaseUrl + UserFlow.PasswordReset
+    });
   }
 
   private subscribeToMsalTopics() {

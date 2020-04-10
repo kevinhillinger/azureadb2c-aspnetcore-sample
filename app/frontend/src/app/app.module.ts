@@ -29,7 +29,7 @@ import { environment } from 'src/environments/environment';
         clientId: environment.auth.clientId,
         navigateToLoginRequestUrl : false,
         redirectUri: environment.auth.redirectUri,
-        postLogoutRedirectUri: environment.auth.postLogoutRedirectUri,
+        postLogoutRedirectUri: environment.auth.redirectUri,
         validateAuthority: false, //must be false to support B2C
         authority: environment.auth.authority
       },
@@ -40,7 +40,7 @@ import { environment } from 'src/environments/environment';
     },
     {
       popUp: false, 
-      consentScopes: environment.consentScopes
+      consentScopes: environment.auth.consentScopes
     }),
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
