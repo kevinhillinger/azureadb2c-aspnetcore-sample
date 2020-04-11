@@ -273,6 +273,7 @@
 						<DisplayClaim ClaimTypeReferenceId="newPassword" Required="true" />
 						<DisplayClaim ClaimTypeReferenceId="reenterPassword" Required="true" />
             <DisplayClaim ClaimTypeReferenceId="AgreedToTermsAndConditions"  />
+            <DisplayClaim ClaimTypeReferenceId="email"  />
           </DisplayClaims>
 					<OutputClaims>
 						<OutputClaim ClaimTypeReferenceId="oldPassword" Required="true" />
@@ -283,20 +284,15 @@
             <OutputClaim ClaimTypeReferenceId="policyTermsAndConditionsVersion"  />
             <OutputClaim ClaimTypeReferenceId="extension_AgreedToTermsAndConditions" DefaultValue=""/>
 					</OutputClaims>
-					<ValidationTechnicalProfiles>
+          <ValidationTechnicalProfiles>
+            <ValidationTechnicalProfile ReferenceId="login-NonInteractive-PasswordChange" />
+            <ValidationTechnicalProfile ReferenceId="ClaimsTransformation-SetIsNewPasswordEmail" />
+            <ValidationTechnicalProfile ReferenceId="VerifyNewPasswordDoesNotContainEmail" />
+            <ValidationTechnicalProfile ReferenceId="REST-ValidateUserProfileWithEmail" />
             <ValidationTechnicalProfile ReferenceId="ComparePasswords" />
-            <ValidationTechnicalProfile ReferenceId="VerifyTermsAndConditionsWereAccepted" /> 
-            <!--ValidationTechnicalProfile ReferenceId="VerifyNewPasswordDoesNotContainEmail" /--> 
-						<ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId">
-							<Preconditions>
-								<Precondition Type="ClaimEquals" ExecuteActionsIf="true">
-									<Value>SamePassword</Value>
-									<Value>true</Value>
-									<Action>SkipThisValidationTechnicalProfile</Action>
-								</Precondition>
-							</Preconditions>
-						</ValidationTechnicalProfile>
-					</ValidationTechnicalProfiles>
+            <ValidationTechnicalProfile ReferenceId="VerifyTermsAndConditionsWereAccepted" />
+            <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId" />
+          </ValidationTechnicalProfiles>
 				</TechnicalProfile>
 
 				<!-- Runs claimsTransformations to make sure new and old passwords differ -->

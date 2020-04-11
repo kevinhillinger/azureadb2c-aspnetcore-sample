@@ -772,6 +772,46 @@
         in this section, then it cannot be used in a technical policy.
     -->
   <ClaimsProviders>
+    <ClaimsProvider>
+      <DisplayName>Local Account SignIn</DisplayName>
+      <TechnicalProfiles>
+        <TechnicalProfile Id="login-NonInteractive-PasswordChange">
+          <DisplayName>Login for password reset</DisplayName>
+          <Protocol Name="OpenIdConnect" />
+          <Metadata>
+            <Item Key="UserMessageIfClaimsPrincipalDoesNotExist">We can't seem to find your account</Item>
+            <Item Key="UserMessageIfInvalidPassword">Your password is incorrect</Item>
+            <Item Key="UserMessageIfOldPasswordUsed">Looks like you used an old password</Item>
+            <Item Key="ProviderName">https://sts.windows.net/</Item>
+            <Item Key="METADATA">https://login.microsoftonline.com/{tenant}/.well-known/openid-configuration</Item>
+            <Item Key="authorization_endpoint">https://login.microsoftonline.com/{tenant}/oauth2/token</Item>
+            <Item Key="response_types">id_token</Item>
+            <Item Key="response_mode">query</Item>
+            <Item Key="scope">email openid</Item>
+            <Item Key="UsePolicyInRedirectUri">false</Item>
+            <Item Key="HttpBinding">POST</Item>
+            <Item Key="client_id">{Settings:ProxyIdentityExperienceFrameworkAppId}</Item>
+            <Item Key="IdTokenAudience">{Settings:IdentityExperienceFrameworkAppId}</Item>
+          </Metadata>
+          <InputClaims>
+            <InputClaim ClaimTypeReferenceId="email"  PartnerClaimType="username" Required="true"  />
+            <InputClaim ClaimTypeReferenceId="oldPassword" PartnerClaimType="password" Required="true" />
+            <InputClaim ClaimTypeReferenceId="grant_type" DefaultValue="password" />
+            <InputClaim ClaimTypeReferenceId="scope" DefaultValue="openid" />
+            <InputClaim ClaimTypeReferenceId="nca" PartnerClaimType="nca" DefaultValue="1" />
+            <InputClaim ClaimTypeReferenceId="client_id" DefaultValue="{Settings:ProxyIdentityExperienceFrameworkAppId}" />
+            <InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="{Settings:IdentityExperienceFrameworkAppId}" />
+          </InputClaims>
+          <OutputClaims>
+            <OutputClaim ClaimTypeReferenceId="objectId" PartnerClaimType="oid" />
+            <OutputClaim ClaimTypeReferenceId="tenantId" PartnerClaimType="tid" />
+            <OutputClaim ClaimTypeReferenceId="displayName" PartnerClaimType="name" />
+            <OutputClaim ClaimTypeReferenceId="userPrincipalName" PartnerClaimType="upn" />
+            <OutputClaim ClaimTypeReferenceId="authenticationSource" DefaultValue="localAccountAuthentication" />
+          </OutputClaims>
+        </TechnicalProfile>
+      </TechnicalProfiles>
+    </ClaimsProvider>
     
       <ClaimsProvider>
       <DisplayName>Claims Transformation</DisplayName>
@@ -1388,16 +1428,8 @@
             <OutputClaim ClaimTypeReferenceId="givenName"  DefaultValue=""/>
             <OutputClaim ClaimTypeReferenceId="surName"  DefaultValue=""/>
             <OutputClaim ClaimTypeReferenceId="isNewPasswordEmail" DefaultValue="false"/>
-
           </OutputClaims>
-          <ValidationTechnicalProfiles>
-            <ValidationTechnicalProfile ReferenceId="ClaimsTransformation-SetIsNewPasswordEmail" />
-            <ValidationTechnicalProfile ReferenceId="VerifyNewPasswordDoesNotContainEmail" /> 
-            <ValidationTechnicalProfile ReferenceId="REST-ValidateUserProfileWithEmail" /> 
-            <ValidationTechnicalProfile ReferenceId="AAD-UserWritePasswordUsingObjectId" />
-          </ValidationTechnicalProfiles>
         </TechnicalProfile>
-
       </TechnicalProfiles>
     </ClaimsProvider>
 
